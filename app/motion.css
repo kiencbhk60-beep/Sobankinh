@@ -1,0 +1,24 @@
+/* Short feedback for frequent work; no page/list entrance delays. */
+:root{--ease-out-ui:cubic-bezier(.23,1,.32,1)}
+html{scrollbar-gutter:stable;scroll-behavior:auto;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+button,a,[role=button],summary{touch-action:manipulation}
+button,[role=button],summary{-webkit-user-select:none;user-select:none}
+button{transition:transform 120ms var(--ease-out-ui),background-color 140ms ease,color 140ms ease,border-color 140ms ease}
+button:active:not(:disabled){transform:scale(.98)}
+.nav:active:not(:disabled){transform:none;background:#e3ecd9}
+.product-card{transition:transform 140ms var(--ease-out-ui),border-color 140ms ease,background-color 140ms ease}
+.product-card:active:not(:disabled){transform:scale(.985)}
+.product-photo img{transition:transform 180ms var(--ease-out-ui)}
+.iconbtn,.qty button{min-width:44px;min-height:44px;justify-content:center}
+input,select,textarea{font-size:16px}
+.table-wrap,.sidebar nav,.modal,.order-panel{overscroll-behavior:contain}
+.motion-dialog{border:0;margin:0;width:100%;max-width:none;height:100dvh;max-height:none;color:inherit;overflow:hidden;background:transparent;backdrop-filter:none;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.motion-dialog:not([open]){display:none}
+.motion-dialog[open]{display:flex}
+.motion-dialog::backdrop{background:#17281d70}
+.motion-dialog .modal{max-height:calc(100dvh - 40px);overscroll-behavior:contain;opacity:1;transform:scale(1);transition:opacity 180ms var(--ease-out-ui),transform 180ms var(--ease-out-ui)}
+@starting-style{.motion-dialog[open] .modal{opacity:0;transform:scale(.98)}.toast{opacity:0}}
+.toast{opacity:1;transition:opacity 150ms var(--ease-out-ui);pointer-events:none}
+@media(max-width:700px){.topbar{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}.motion-dialog .modal{max-height:calc(100dvh - 32px)}.modal-footer{padding-bottom:max(16px,env(safe-area-inset-bottom))}}
+html[data-input=keyboard] *,html[data-input=keyboard] *::before,html[data-input=keyboard] *::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
