@@ -1,0 +1,304 @@
+{
+  "products": [
+    {
+      "code": "K-01",
+      "name": "Mắt to hồng xám",
+      "cost": 82793,
+      "stock": 1,
+      "price": 0,
+      "threshold": 1,
+      "image": "/products/row-8.png",
+      "orderStock": 0,
+      "kind": "glasses",
+      "unit": "chiếc"
+    },
+    {
+      "code": "K-02",
+      "name": "Mắt to xanh lá xám",
+      "cost": 82793,
+      "stock": 2,
+      "price": 0,
+      "threshold": 1,
+      "image": "/products/row-9.png",
+      "orderStock": 0,
+      "kind": "glasses",
+      "unit": "chiếc"
+    },
+    {
+      "code": "K-03",
+      "name": "Mắt to cam đen",
+      "cost": 82793,
+      "stock": 1,
+      "price": 0,
+      "threshold": 1,
+      "image": "/products/row-10.png",
+      "orderStock": 0,
+      "kind": "glasses",
+      "unit": "chiếc"
+    },
+    {
+      "code": "K-04",
+      "name": "Mắt to xanh dương xám",
+      "cost": 82793,
+      "stock": 2,
+      "price": 0,
+      "threshold": 1,
+      "image": "/products/row-11.png",
+      "orderStock": 0,
+      "kind": "glasses",
+      "unit": "chiếc"
+    },
+    {
+      "code": "K-05",
+      "name": "Mắt bé hồng xám",
+      "cost": 42893,
+      "stock": 2,
+      "price": 0,
+      "threshold": 1,
+      "image": "/products/row-12.png",
+      "orderStock": 0,
+      "kind": "glasses",
+      "unit": "chiếc"
+    },
+    {
+      "code": "K-06",
+      "name": "Mắt bé cam đen",
+      "cost": 71621,
+      "stock": 2,
+      "price": 0,
+      "threshold": 1,
+      "image": "/products/row-13.png",
+      "orderStock": 0,
+      "kind": "glasses",
+      "unit": "chiếc"
+    },
+    {
+      "code": "K-07",
+      "name": "Mắt bé xanh đen",
+      "cost": 71621,
+      "stock": 1,
+      "price": 0,
+      "threshold": 1,
+      "image": "/products/row-14.png",
+      "orderStock": 0,
+      "kind": "glasses",
+      "unit": "chiếc"
+    },
+    {
+      "code": "K-08",
+      "name": "Mắt bé xanh dương xám",
+      "cost": 42893,
+      "stock": 2,
+      "price": 0,
+      "threshold": 1,
+      "image": "/products/row-15.png",
+      "orderStock": 0,
+      "kind": "glasses",
+      "unit": "chiếc"
+    },
+    {
+      "code": "K-09",
+      "name": "Mắt bé đen",
+      "cost": 38903,
+      "stock": 1,
+      "price": 0,
+      "threshold": 1,
+      "image": "/products/row-16.png",
+      "orderStock": 0,
+      "kind": "glasses",
+      "unit": "chiếc"
+    },
+    {
+      "code": "K-10",
+      "name": "Đen bạc",
+      "cost": 59651,
+      "stock": 1,
+      "price": 0,
+      "threshold": 1,
+      "image": "/products/row-17.png",
+      "orderStock": 0,
+      "kind": "glasses",
+      "unit": "chiếc"
+    },
+    {
+      "code": "K-11",
+      "name": "Kính K-11",
+      "cost": 59651,
+      "stock": 1,
+      "price": 0,
+      "threshold": 1,
+      "image": "/products/row-18.png",
+      "orderStock": 0,
+      "kind": "glasses",
+      "unit": "chiếc"
+    },
+    {
+      "code": "HO-01",
+      "name": "Hộp to",
+      "unit": "cái",
+      "kind": "packaging",
+      "cost": 0,
+      "price": 0,
+      "stock": 0,
+      "orderStock": 0,
+      "threshold": 1,
+      "image": ""
+    },
+    {
+      "code": "HO-02",
+      "name": "Hộp nhỏ",
+      "unit": "cái",
+      "kind": "packaging",
+      "cost": 0,
+      "price": 0,
+      "stock": 0,
+      "orderStock": 0,
+      "threshold": 1,
+      "image": ""
+    },
+    {
+      "code": "CCS",
+      "name": "Gói chống sốc",
+      "unit": "cuộn",
+      "kind": "packaging",
+      "cost": 0,
+      "price": 0,
+      "stock": 0,
+      "orderStock": 0,
+      "threshold": 1,
+      "image": ""
+    },
+    {
+      "code": "TĐ",
+      "name": "Túi đựng",
+      "unit": "cái",
+      "kind": "packaging",
+      "cost": 0,
+      "price": 0,
+      "stock": 0,
+      "orderStock": 0,
+      "threshold": 1,
+      "image": ""
+    },
+    {
+      "code": "HK",
+      "name": "Hộp kính",
+      "unit": "hộp",
+      "kind": "packaging",
+      "cost": 0,
+      "price": 0,
+      "stock": 0,
+      "orderStock": 0,
+      "threshold": 1,
+      "image": ""
+    }
+  ],
+  "lots": [
+    {
+      "id": "opening-K-01",
+      "code": "K-01",
+      "date": "0000-00-00",
+      "qty": 1,
+      "remaining": 1,
+      "cost": 82793,
+      "source": "Tồn đầu Inventory · 10/11/2026"
+    },
+    {
+      "id": "opening-K-02",
+      "code": "K-02",
+      "date": "0000-00-00",
+      "qty": 2,
+      "remaining": 2,
+      "cost": 82793,
+      "source": "Tồn đầu Inventory · 10/11/2026"
+    },
+    {
+      "id": "opening-K-03",
+      "code": "K-03",
+      "date": "0000-00-00",
+      "qty": 1,
+      "remaining": 1,
+      "cost": 82793,
+      "source": "Tồn đầu Inventory · 10/11/2026"
+    },
+    {
+      "id": "opening-K-04",
+      "code": "K-04",
+      "date": "0000-00-00",
+      "qty": 2,
+      "remaining": 2,
+      "cost": 82793,
+      "source": "Tồn đầu Inventory · 10/11/2026"
+    },
+    {
+      "id": "opening-K-05",
+      "code": "K-05",
+      "date": "0000-00-00",
+      "qty": 2,
+      "remaining": 2,
+      "cost": 42893,
+      "source": "Tồn đầu Inventory · 10/11/2026"
+    },
+    {
+      "id": "opening-K-06",
+      "code": "K-06",
+      "date": "0000-00-00",
+      "qty": 2,
+      "remaining": 2,
+      "cost": 71621,
+      "source": "Tồn đầu Inventory · 10/11/2026"
+    },
+    {
+      "id": "opening-K-07",
+      "code": "K-07",
+      "date": "0000-00-00",
+      "qty": 1,
+      "remaining": 1,
+      "cost": 71621,
+      "source": "Tồn đầu Inventory · 10/11/2026"
+    },
+    {
+      "id": "opening-K-08",
+      "code": "K-08",
+      "date": "0000-00-00",
+      "qty": 2,
+      "remaining": 2,
+      "cost": 42893,
+      "source": "Tồn đầu Inventory · 10/11/2026"
+    },
+    {
+      "id": "opening-K-09",
+      "code": "K-09",
+      "date": "0000-00-00",
+      "qty": 1,
+      "remaining": 1,
+      "cost": 38903,
+      "source": "Tồn đầu Inventory · 10/11/2026"
+    },
+    {
+      "id": "opening-K-10",
+      "code": "K-10",
+      "date": "0000-00-00",
+      "qty": 1,
+      "remaining": 1,
+      "cost": 59651,
+      "source": "Tồn đầu Inventory · 10/11/2026"
+    },
+    {
+      "id": "opening-K-11",
+      "code": "K-11",
+      "date": "0000-00-00",
+      "qty": 1,
+      "remaining": 1,
+      "cost": 59651,
+      "source": "Tồn đầu Inventory · 10/11/2026"
+    }
+  ],
+  "orders": [],
+  "receipts": [],
+  "history": [],
+  "costHistory": [],
+  "costVersion": 1,
+  "fifoVersion": 1,
+  "packagingVersion": 1
+}
