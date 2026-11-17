@@ -4,6 +4,19 @@ export type Allocation={lotId:string;date:string;qty:number;cost:number};
 export type Line={code:string;name:string;qty:number;price:number;cost:number;orderQty?:number;allocations?:Allocation[]};
 export type Order={id:string;number:string;date:string;customer:string;phone:string;address:string;seller:string;note:string;tracking:string;status:string;paid:number;expense:number;lines:Line[];packaging?:Line[]};
 export type State={products:Product[];orders:Order[];receipts:any[];history:any[];lots?:Lot[];fifoVersion?:number;packagingVersion?:number;costVersion?:number;costHistory?:{code:string;before:number;after:number;date:string;source:string}[]};
+export const SHOP_PRODUCT_MAP:Record<string,string>={
+ ridgeline:'K-08',
+ nightfall:'K-09',
+ aurora:'K-05',
+ suncrest:'K-03',
+ ember:'K-06',
+ granite:'K-10',
+ wildtrail:'K-11',
+ sandstone:'K-01',
+ bluehour:'K-07',
+};
+export const CODE_TO_SHOP_KEY:Record<string,string>=Object.fromEntries(Object.entries(SHOP_PRODUCT_MAP).map(([k,v])=>[v,k]));
+export const HELD_STATUSES=['Chờ xác nhận','Chờ giao','Chờ hàng về'];
 export const packagingCatalog=[
  {code:'HO-01',name:'Hộp to',unit:'cái'},
  {code:'HO-02',name:'Hộp nhỏ',unit:'cái'},
@@ -26,12 +39,31 @@ export function quoteFIFO(s:State,code:string,qty:number){
  return {cost,missing:left};
 }
 export const total=(o:Order)=>o.lines.reduce((s,l)=>s+l.qty*l.price,0);
-export const reserved=(s:State,code:string)=>s.orders.filter(o=>['Chờ giao','Chờ hàng về'].includes(o.status)).reduce((n,o)=>n+o.lines.filter(l=>l.code===code).reduce((n,l)=>n+l.qty-(l.orderQty??0),0),0);
+export const reserved=(s:State,code:string)=>s.orders.filter(o=>HELD_STATUSES.includes(o.status)).reduce((n,o)=>n+o.lines.filter(l=>l.code===code).reduce((n,l)=>n+l.qty-(l.orderQty??0),0),0);
 export const available=(s:State,p:Product)=>p.stock-reserved(s,p.code);
-export const reservedOrder=(s:State,code:string)=>s.orders.filter(o=>['Chờ giao','Chờ hàng về'].includes(o.status)).reduce((n,o)=>n+o.lines.filter(l=>l.code===code).reduce((n,l)=>n+(l.orderQty??0),0),0);
+export const reservedOrder=(s:State,code:string)=>s.orders.filter(o=>HELD_STATUSES.includes(o.status)).reduce((n,o)=>n+o.lines.filter(l=>l.code===code).reduce((n,l)=>n+(l.orderQty??0),0),0);
 export const availableOrder=(s:State,p:Product)=>(p.orderStock??0)-reservedOrder(s,p.code);
 export const sellable=(s:State,p:Product)=>available(s,p)+availableOrder(s,p);
 export const lineCost=(l:Line)=>l.allocations?l.allocations.reduce((n,a)=>n+a.qty*a.cost,0):l.qty*l.cost;
+export type PublicCatalogItem={code:string;shopKey:string|null;name:string;price:number|null;priceDisplay:string;orderable:boolean;inStock:boolean;availableQty:number};
+export function buildPublicCatalog(input:State):PublicCatalogItem[]{
+ const s=migrateFIFO(migratePackaging(input));
+ return s.products.filter(p=>!isPackaging(p)).map(p=>{
+  const validPrice=typeof p.price==='number'&&Number.isFinite(p.price)&&p.price>0?p.price:null;
+  const qty=Math.max(0,sellable(s,p));
+  const inStock=qty>0;
+  return {
+   code:p.code,
+   shopKey:CODE_TO_SHOP_KEY[p.code]??null,
+   name:p.name,
+   price:validPrice,
+   priceDisplay:validPrice!==null?new Intl.NumberFormat('vi-VN').format(validPrice)+' ₫':'Liên hệ để biết giá',
+   orderable:validPrice!==null&&inStock,
+   inStock,
+   availableQty:qty,
+  };
+ });
+}
 export function migrateFIFO(input:State):State{
  const s=structuredClone(input);if(s.fifoVersion===1)return s;
  s.lots=[];
@@ -70,16 +102,29 @@ export function applyAction(original:State,a:any):State{
   });
   if(!str(d.seller))throw Error('Vui lòng chọn người bán');
   if(!/^\d{4}-\d{2}-\d{2}$/.test(d.date))throw Error('Ngày bán không hợp lệ');
-  const o:Order={id:str(d.id,80),number:'DH-'+String(s.orders.length+1).padStart(4,'0'),date:d.date,customer:str(d.customer)||'Khách lẻ',phone:str(d.phone,30),address:str(d.address),seller:str(d.seller,80),note:str(d.note),tracking:'',status:lines.some((l:Line)=>(l.orderQty??0)>0)?'Chờ hàng về':'Chờ giao',paid:num(d.paid,'Tiền đã thu'),expense:0,lines,packaging};
+  const isOnline=d.online===true;
+  const status=isOnline?'Chờ xác nhận':(lines.some((l:Line)=>(l.orderQty??0)>0)?'Chờ hàng về':'Chờ giao');
+  const paid=isOnline?0:num(d.paid,'Tiền đã thu');
+  const o:Order={id:str(d.id,80),number:'DH-'+String(s.orders.length+1).padStart(4,'0'),date:d.date,customer:str(d.customer)||'Khách lẻ',phone:str(d.phone,30),address:str(d.address),seller:str(d.seller,80),note:str(d.note),tracking:'',status,paid,expense:0,lines,packaging};
   if(!o.id||o.paid>total(o))throw Error('Tiền đã thu không được vượt tổng đơn');s.orders.unshift(o);
  }else if(a.type==='update'){
   const o=s.orders.find(o=>o.id===d.id);if(!o)throw Error('Không tìm thấy đơn');
-  const next=str(d.status);const allowed:Record<string,string[]>={'Chờ hàng về':['Chờ hàng về','Đã hủy'],'Chờ giao':['Chờ giao','Đang giao','Đã giao','Đã hủy'],'Đang giao':['Đang giao','Đã giao','Đã hoàn'],'Đã giao':['Đã giao','Đã hoàn'],'Đã hủy':['Đã hủy'],'Đã hoàn':['Đã hoàn']};
+  const next=str(d.status);
+  const waitingOrder=o.lines.some(l=>(l.orderQty??0)>0);
+  const allowed:Record<string,string[]>={
+   'Chờ xác nhận':waitingOrder?['Chờ xác nhận','Chờ hàng về','Đã hủy']:['Chờ xác nhận','Chờ giao','Đang giao','Đã giao','Đã hủy'],
+   'Chờ hàng về':['Chờ hàng về','Đã hủy'],
+   'Chờ giao':['Chờ giao','Đang giao','Đã giao','Đã hủy'],
+   'Đang giao':['Đang giao','Đã giao','Đã hoàn'],
+   'Đã giao':['Đã giao','Đã hoàn'],
+   'Đã hủy':['Đã hủy'],
+   'Đã hoàn':['Đã hoàn'],
+  };
   if(!allowed[o.status]?.includes(next))throw Error('Chuyển trạng thái không hợp lệ');
   const paid=num(d.paid,'Tiền đã thu');if(paid>total(o))throw Error('Tiền đã thu vượt tổng đơn');
-  if(o.status==='Chờ giao'&&['Đang giao','Đã giao'].includes(next))for(const l of o.lines){const p=s.products.find(p=>p.code===l.code)!;if(p.stock<l.qty)throw Error('Không đủ hàng trong kho');p.stock-=l.qty;}
+  if(['Chờ xác nhận','Chờ giao'].includes(o.status)&&['Đang giao','Đã giao'].includes(next))for(const l of o.lines){const p=s.products.find(p=>p.code===l.code)!;if((l.orderQty??0)>0||p.stock<l.qty)throw Error('Không đủ hàng trong kho');p.stock-=l.qty;}
   if(['Đang giao','Đã giao'].includes(o.status)&&next==='Đã hoàn')for(const l of o.lines){s.products.find(p=>p.code===l.code)!.stock+=l.qty;restoreLine(s,l,o.id);}
-  if(['Chờ giao','Chờ hàng về'].includes(o.status)&&next==='Đã hủy'){for(const l of o.lines)restoreLine(s,l,o.id);for(const l of o.packaging??[]){s.products.find(p=>p.code===l.code)!.stock+=l.qty;restoreLine(s,l,o.id);}}
+  if(HELD_STATUSES.includes(o.status)&&next==='Đã hủy'){for(const l of o.lines)restoreLine(s,l,o.id);for(const l of o.packaging??[]){s.products.find(p=>p.code===l.code)!.stock+=l.qty;restoreLine(s,l,o.id);}}
   o.status=next;o.paid=paid;o.tracking=str(d.tracking,100);o.note=str(d.note);
  }else if(a.type==='receipt'){
   if(s.receipts.some(r=>r.id===d.id))return s;
@@ -92,7 +137,7 @@ export function applyAction(original:State,a:any):State{
    if(qty>(p.orderStock??0))throw Error('Số nhận vượt tồn order');
    p.orderStock=(p.orderStock??0)-qty;
    let remaining=qty;
-   for(const o of [...s.orders].reverse())if(['Chờ hàng về','Chờ giao'].includes(o.status)){
+   for(const o of [...s.orders].reverse())if(HELD_STATUSES.includes(o.status)){
     for(const l of o.lines)if(l.code===p.code){const received=Math.min(remaining,l.orderQty??0);if(received){
       if(!l.allocations){const held=l.qty-(l.orderQty??0);l.allocations=held?[{lotId:'legacy-held-'+o.id+'-'+l.code,date:'0000-00-00',qty:held,cost:l.cost}]:[];if(held)s.lots!.push({id:'legacy-held-'+o.id+'-'+l.code,code:l.code,date:'0000-00-00',qty:held,remaining:0,cost:l.cost,source:'Giữ cho đơn cũ'});}
       l.allocations.push(...takeLots(s,p.code,received));
