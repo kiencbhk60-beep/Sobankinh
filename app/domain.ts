@@ -10,8 +10,6 @@ export const SHOP_PRODUCT_MAP:Record<string,string>={
  aurora:'K-05',
  suncrest:'K-03',
  ember:'K-06',
- granite:'K-10',
- wildtrail:'K-11',
  sandstone:'K-01',
  bluehour:'K-07',
 };
