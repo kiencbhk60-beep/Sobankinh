@@ -22,6 +22,12 @@ function allowedTransitionsForOrder(o:Order):string[]{
 export default function SalesApp(){
  const [state,setState]=useState<State>(seed as State),[revision,setRevision]=useState(0),[ready,setReady]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[toast,setToast]=useState('');
  const [tab,setTab]=useState('Dashboard'),[search,setSearch]=useState(''),[onlyStock,setOnlyStock]=useState(false),[filter,setFilter]=useState('Tất cả');
+ useEffect(()=>{
+  if(!window.matchMedia('(max-width:700px)').matches)return;
+  const dock=document.querySelector<HTMLElement>('.sidebar');
+  const active=dock?.querySelector<HTMLElement>('.nav.active');
+  if(dock&&active)dock.scrollTo({left:active.offsetLeft-(dock.clientWidth-active.offsetWidth)/2});
+ },[tab]);
  const [cart,setCart]=useState<{code:string;qty:number;price:number}[]>([]),[customer,setCustomer]=useState(''),[phone,setPhone]=useState(''),[address,setAddress]=useState(''),[seller,setSeller]=useState<string>(STAFF[0]),[date,setDate]=useState(''),[note,setNote]=useState(''),[paid,setPaid]=useState<number|string>(''),[cartId,setCartId]=useState('');
  const [packagingSelection,setPackagingSelection]=useState<Record<string,string>>({});
  const [modal,setModal]=useState<'receipt'|'product'|'order'|null>(null),[form,setForm]=useState<any>({});
