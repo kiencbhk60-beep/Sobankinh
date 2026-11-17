@@ -8,6 +8,7 @@ export async function readStore(db:StoreDB){
  const row=await db.prepare('SELECT data,revision FROM stores WHERE id=?').bind(STORE_ID).first();
  if(!row)throw Error('Kho dữ liệu chưa sẵn sàng.');
  const value=JSON.parse(row.data) as Stored;
+ for(const sp of seed.products){const p=value.state.products.find(x=>x.code===sp.code);if(p&&sp.image)p.image=sp.image;}
  return {state:value.state,revision:row.revision as number,operations:value.operations??[]};
 }
 export async function writeStore(db:StoreDB,action:any){
