@@ -66,7 +66,7 @@ const oldOrderSnapshot=structuredClone(res.body.state.orders[0]);
 
 // 1. Test Case: Sản phẩm chưa có giá (Products with price = 0 in seed)
 let catalog=await readPublicCatalog(db);
-const ridgelineBefore=catalog.items.find(i=>i.code==='K-08');
+const ridgelineBefore=catalog.items.find(i=>i.code==='K-04');
 assert.equal(ridgelineBefore.shopKey,'ridgeline');
 assert.equal(ridgelineBefore.price,null);
 assert.equal(ridgelineBefore.priceDisplay,'Liên hệ để biết giá');
@@ -79,7 +79,7 @@ for(const item of catalog.items){
 }
 assert.equal(catalog.items.some(i=>i.code==='HO-01'),false,'Catalog must NEVER expose packaging');
 
-// Attempt to order unpriced product (K-08 / ridgeline) -> must fail with 400
+// Attempt to order unpriced product (K-04 / ridgeline) -> must fail with 400
 resetRateLimits();
 const unpricedAttempt=await createOnlineOrder(db,{
  idempotencyKey:'order-unpriced-0001',
@@ -93,8 +93,8 @@ assert.match(unpricedAttempt.body.error,/chưa có giá bán/);
 
 // 2. Test Case: Thay đổi giá trong Sổ, Shop hiển thị giá mới
 store=await readStore(db);
-// Update prices for K-08 (RIDGELINE: stock 2), K-09 (NIGHTFALL: stock 1), K-05 (AURORA: stock 2), K-01 (SANDSTONE: stock 1)
-for(const [code,newPrice] of [['K-08',450000],['K-09',390000],['K-05',520000],['K-01',480000]]){
+// Update prices for K-04 (RIDGELINE: stock 2), K-09 (NIGHTFALL: stock 1), K-05 (AURORA: stock 2), K-01 (SANDSTONE: stock 1)
+for(const [code,newPrice] of [['K-04',450000],['K-09',390000],['K-05',520000],['K-01',480000]]){
  store=await readStore(db);
  const prod=store.state.products.find(p=>p.code===code);
  const updatedProd=await writeStore(db,{
@@ -107,7 +107,7 @@ for(const [code,newPrice] of [['K-08',450000],['K-09',390000],['K-05',520000],['
 }
 
 catalog=await readPublicCatalog(db);
-const ridgelineAfter=catalog.items.find(i=>i.code==='K-08');
+const ridgelineAfter=catalog.items.find(i=>i.code==='K-04');
 assert.equal(ridgelineAfter.price,450000);
 assert.equal(ridgelineAfter.inStock,true);
 assert.equal(ridgelineAfter.availableQty,2);
@@ -121,7 +121,7 @@ const singleOrderRes=await createOnlineOrder(db,{
  phone:'0987 654 321',
  address:'456 Điện Biên Phủ, Quận Bình Thạnh, TP.HCM',
  note:'Giao giờ hành chính',
- items:[{shopKey:'ridgeline',code:'K-08',qty:1,price:1000}], // Tampered client price = 1000
+ items:[{shopKey:'ridgeline',code:'K-04',qty:1,price:1000}], // Tampered client price = 1000
 },'10.0.0.2');
 assert.equal(singleOrderRes.status,201);
 assert.equal(singleOrderRes.body.ok,true);
@@ -158,9 +158,9 @@ for(const dup of duplicateClicks){
  assert.equal(dup.body.order.id,singleOrderRes.body.order.id);
  assert.equal(dup.body.order.number,singleOrderRes.body.order.number);
 }
-// Verify K-08 available stock only decreased by 1 (from 2 to 1), not 3!
+// Verify K-04 available stock only decreased by 1 (from 2 to 1), not 3!
 catalog=await readPublicCatalog(db);
-assert.equal(catalog.items.find(i=>i.code==='K-08').availableQty,1);
+assert.equal(catalog.items.find(i=>i.code==='K-04').availableQty,1);
 
 // 5. Test Case: Khách đặt nhiều sản phẩm trong 1 đơn
 const multiOrderRes=await createOnlineOrder(db,{
@@ -170,7 +170,7 @@ const multiOrderRes=await createOnlineOrder(db,{
  address:'789 Nguyễn Trãi, Quận 5, TP. Hồ Chí Minh',
  note:'Đóng gói kỹ giúp mình',
  items:[
-  {shopKey:'ridgeline',qty:1}, // 450,000 (last unit of K-08)
+  {shopKey:'ridgeline',qty:1}, // 450,000 (last unit of K-04)
   {shopKey:'aurora',qty:2},    // 520,000 * 2 = 1,040,000 (all 2 units of K-05)
  ],
 },'10.0.0.3');
@@ -178,12 +178,12 @@ assert.equal(multiOrderRes.status,201);
 assert.equal(multiOrderRes.body.order.total,450000+1040000);
 assert.equal(multiOrderRes.body.order.lines.length,2);
 
-// 6. Test Case: Sản phẩm hết hàng (K-08 and K-05 now have 0 availableQty)
+// 6. Test Case: Sản phẩm hết hàng (K-04 and K-05 now have 0 availableQty)
 catalog=await readPublicCatalog(db);
-const k08Out=catalog.items.find(i=>i.code==='K-08');
-assert.equal(k08Out.inStock,false);
-assert.equal(k08Out.availableQty,0);
-assert.equal(k08Out.orderable,false);
+const k04Out=catalog.items.find(i=>i.code==='K-04');
+assert.equal(k04Out.inStock,false);
+assert.equal(k04Out.availableQty,0);
+assert.equal(k04Out.orderable,false);
 
 const outOfStockOrder=await createOnlineOrder(db,{
  idempotencyKey:'out-of-stock-key-0003',
@@ -223,7 +223,7 @@ assert.equal(recordedSingle.customer,'Trần Minh Hoàng');
 assert.equal(recordedSingle.seller,'Web Cincacao');
 assert.equal(recordedSingle.status,'Chờ xác nhận');
 assert.equal(recordedSingle.paid,0);
-assert.equal(lineCost(recordedSingle.lines[0]),42893); // FIFO cost preserved from opening lot of K-08!
+assert.equal(lineCost(recordedSingle.lines[0]),82793); // FIFO cost preserved from opening lot of K-04!
 
 // Transition singleOrder from Chờ xác nhận -> Đang giao -> Đã giao
 res=await writeStore(db,{
@@ -233,8 +233,8 @@ res=await writeStore(db,{
  data:{id:recordedSingle.id,status:'Đang giao',paid:0,tracking:'VN123456',note:recordedSingle.note},
 });
 assert.equal(res.status,200);
-// Stock of K-08 physically decremented from 2 to 1 when entering Đang giao
-assert.equal(res.body.state.products.find(p=>p.code==='K-08').stock,1);
+// Stock of K-04 physically decremented from 2 to 1 when entering Đang giao
+assert.equal(res.body.state.products.find(p=>p.code==='K-04').stock,1);
 
 res=await writeStore(db,{
  type:'update',
@@ -254,16 +254,16 @@ res=await writeStore(db,{
 });
 assert.equal(res.status,200);
 catalog=await readPublicCatalog(db);
-assert.equal(catalog.items.find(i=>i.code==='K-08').availableQty,1);
+assert.equal(catalog.items.find(i=>i.code==='K-04').availableQty,1);
 assert.equal(catalog.items.find(i=>i.code==='K-05').availableQty,2);
 
 // 9. Test Case: Đơn hàng cũ và tồn kho cũ không bị ảnh hưởng
 store=await readStore(db);
 const preservedOldOrder=store.state.orders.find(o=>o.id==='existing-internal-order-1');
 assert.deepEqual(preservedOldOrder,oldOrderSnapshot);
-const k04=store.state.products.find(p=>p.code==='K-04');
-assert.equal(k04.stock,2);
-assert.equal(k04.cost,82793);
+const k08=store.state.products.find(p=>p.code==='K-08');
+assert.equal(k08.stock,2);
+assert.equal(k08.cost,42893);
 
 // 10. Verify Trekbross app.js mapping & behavior in simulated DOM / fetch environment
 const trekbrossAppJs=readFileSync('../Trekbross/app.js','utf8');

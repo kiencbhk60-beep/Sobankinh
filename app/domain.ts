@@ -5,13 +5,15 @@ export type Line={code:string;name:string;qty:number;price:number;cost:number;or
 export type Order={id:string;number:string;date:string;customer:string;phone:string;address:string;seller:string;note:string;tracking:string;status:string;paid:number;expense:number;lines:Line[];packaging?:Line[]};
 export type State={products:Product[];orders:Order[];receipts:any[];history:any[];lots?:Lot[];fifoVersion?:number;packagingVersion?:number;costVersion?:number;costHistory?:{code:string;before:number;after:number;date:string;source:string}[]};
 export const SHOP_PRODUCT_MAP:Record<string,string>={
- ridgeline:'K-08',
- nightfall:'K-09',
- aurora:'K-05',
- suncrest:'K-03',
- ember:'K-06',
  sandstone:'K-01',
+ suncrest:'K-03',
+ ridgeline:'K-04',
+ aurora:'K-05',
+ ember:'K-06',
  bluehour:'K-07',
+ nightfall:'K-09',
+ granite:'K-10',
+ wildtrail:'K-11',
 };
 export const CODE_TO_SHOP_KEY:Record<string,string>=Object.fromEntries(Object.entries(SHOP_PRODUCT_MAP).map(([k,v])=>[v,k]));
 export const HELD_STATUSES=['Chờ xác nhận','Chờ giao','Chờ hàng về'];
