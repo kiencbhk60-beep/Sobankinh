@@ -225,10 +225,19 @@ assert.equal(recordedSingle.status,'Chờ xác nhận');
 assert.equal(recordedSingle.paid,0);
 assert.equal(lineCost(recordedSingle.lines[0]),82793); // FIFO cost preserved from opening lot of K-04!
 
-// Transition singleOrder from Chờ xác nhận -> Đang giao -> Đã giao
+// Transition singleOrder from Chờ xác nhận -> Chờ giao (xác nhận đơn) -> Đang giao -> Đã giao
 res=await writeStore(db,{
  type:'update',
  revision:store.revision,
+ requestId:crypto.randomUUID(),
+ data:{id:recordedSingle.id,status:'Chờ giao',paid:0,tracking:'',note:recordedSingle.note},
+});
+assert.equal(res.status,200);
+assert.equal(res.body.state.orders.find(o=>o.id===recordedSingle.id).status,'Chờ giao');
+
+res=await writeStore(db,{
+ type:'update',
+ revision:res.body.revision,
  requestId:crypto.randomUUID(),
  data:{id:recordedSingle.id,status:'Đang giao',paid:0,tracking:'VN123456',note:recordedSingle.note},
 });
@@ -265,7 +274,11 @@ const k08=store.state.products.find(p=>p.code==='K-08');
 assert.equal(k08.stock,2);
 assert.equal(k08.cost,42893);
 
-// 10. Verify Trekbross app.js mapping & behavior in simulated DOM / fetch environment
+// 10. Verify Trekbross app.js mapping & sales-app.tsx routing for "Xác nhận đơn hàng"
+const salesAppCode=readFileSync('app/sales-app.tsx','utf8');
+assert.match(salesAppCode,/https:\/\/cincacao\.trekbross\.workers\.dev/,'Cửa hàng kính must link to Shopbankinh');
+assert.match(salesAppCode,/Xác nhận đơn hàng/,'Sidebar must include child branch "Xác nhận đơn hàng"');
+assert.match(salesAppCode,/tab==='Xác nhận đơn hàng'\?o\.status==='Chờ xác nhận':tab==='Giao hàng'\?\['Chờ hàng về','Chờ giao','Đang giao'\]\.includes\(o\.status\)/,'Chờ xác nhận orders must route to Xác nhận đơn hàng and not Giao hàng');
 const trekbrossAppJs=readFileSync('../Trekbross/app.js','utf8');
 for(const [shopKey,code] of Object.entries(SHOP_PRODUCT_MAP)){
  assert.match(trekbrossAppJs,new RegExp(`${shopKey}:\\s*"${code}"`),`Trekbross app.js must map ${shopKey} -> ${code}`);
