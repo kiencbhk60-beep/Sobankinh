@@ -73,7 +73,7 @@ Thuật toán chọn từng chỗ trống trước đây tạo các bán kính t
 | 21 | Wink khi chuyển sáng/tối |
 | 22 | Proud khi xuất/sao lưu tệp |
 | 23 | Comet khi mở shop |
-| 24 | Sau 8 giây không thao tác: lặp Wink (1,6s) → Thinking (2,6s) → Wide eyes (1,8s). Thao tác lại dừng ngay chuỗi; quay lại tab vẫn có Notification |
+| 24 | Sau 8 giây không thao tác: Wink (1,6s) → Thinking (2,6s) → Wide eyes (1,8s), xen một biểu cảm vui ngẫu nhiên rồi nghỉ 2,4–4 giây trước khi lặp. Có 8 lựa chọn: Curious, Happy, Grinning, Surprised, Shy, Excited, Proud, Skeptical; không chọn trùng lần trước. Thao tác lại dừng ngay chuỗi; quay lại tab vẫn có Notification |
 
 Orbit trong menu được ưu tiên hơn mọi phản ứng nghiệp vụ. Sự kiện kết nối thụ động không che mất thông báo lỗi/thành công. Trong biểu mẫu, mascot nhỏ nằm ở tiêu đề, không cản nút lưu hoặc nhập liệu. Giảm chuyển động: vẽ khung tĩnh của hiệu ứng được chọn; không chạy requestAnimationFrame. Khi ẩn tab thì tạm dừng animation. Dọn timer và listener khi unmount.
 

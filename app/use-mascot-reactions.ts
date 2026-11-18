@@ -1,12 +1,12 @@
 'use client';
 import {useEffect, useState} from 'react';
-import {MASCOT_EVENT, REACTIONS, IDLE_DELAY, IDLE_SEQUENCE, type MascotEvent, type Reaction} from '../lib/mascot-reactions';
+import {MASCOT_EVENT, REACTIONS, IDLE_DELAY, IDLE_SEQUENCE, chooseIdleInterlude, type MascotEvent, type Reaction} from '../lib/mascot-reactions';
 
 export default function useMascotReactions(): Reaction {
   const [reaction, setReaction] = useState<Reaction>(REACTIONS.neutral);
   useEffect(() => {
     let expiry: ReturnType<typeof setTimeout>, idle: ReturnType<typeof setTimeout>;
-    let priority = 0, idling = false;
+    let priority = 0, idling = false, previousInterlude = -1;
     const stopIdle = () => {
       clearTimeout(idle);
       if (idling) {idling=false;setReaction(REACTIONS.neutral);}
@@ -22,9 +22,16 @@ export default function useMascotReactions(): Reaction {
     const cycle = (index = 0) => {
       if (priority > 0 || document.hidden) {idle=setTimeout(()=>cycle(0),1000);return;}
       idling=true;
+      if (index===IDLE_SEQUENCE.length) {
+        const {index:selected,step,pause}=chooseIdleInterlude(previousInterlude,Math.random);
+        previousInterlude=selected;
+        setReaction(step);
+        idle=setTimeout(()=>{setReaction(REACTIONS.neutral);idle=setTimeout(()=>cycle(0),pause);},step.duration);
+        return;
+      }
       const next=IDLE_SEQUENCE[index];
       setReaction(next);
-      idle=setTimeout(()=>cycle((index+1)%IDLE_SEQUENCE.length),next.duration);
+      idle=setTimeout(()=>cycle(index+1),next.duration);
     };
     const activity = () => {stopIdle();idle=setTimeout(()=>cycle(0),IDLE_DELAY);};
     const receive = (event: Event) => {activity();play((event as CustomEvent<MascotEvent>).detail);};

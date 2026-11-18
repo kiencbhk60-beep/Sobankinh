@@ -14,7 +14,7 @@ function load(path) {
   return module.exports;
 }
 const root=fileURLToPath(new URL('../lib/',import.meta.url));
-const {REACTIONS,savedReaction}=load(resolve(root,'mascot-reactions.ts'));
+const {REACTIONS,savedReaction,IDLE_INTERLUDES,chooseIdleInterlude}=load(resolve(root,'mascot-reactions.ts'));
 const {BotEngine}=load(resolve(root,'bloub/engine.ts'));
 const {EXPRESSION_BY_ID}=load(resolve(root,'bloub/expressions.ts'));
 const {SHAPE_BY_ID}=load(resolve(root,'bloub/skins.ts'));
@@ -24,13 +24,18 @@ assert.equal(REACTIONS['drag.end'].state,'wide');
 assert.equal(REACTIONS.search.state,'thinking');
 assert.equal(REACTIONS['cart.add'].expression,'heureux');
 assert.equal(REACTIONS['cart.edit'].expression,'neutre');
-for(const [key,reaction] of Object.entries(REACTIONS)) {
+for(const [key,reaction] of [...Object.entries(REACTIONS),...IDLE_INTERLUDES.map((step,i)=>['idle-'+i,step])]) {
   const engine=new BotEngine(100,reaction.state,SHAPE_BY_ID.get('cercle').radii,EXPRESSION_BY_ID.get(reaction.expression));
   const frame=engine.sample(1.2);
   assert(frame.bodyPath&&!frame.bodyPath.includes('NaN'),key+' has valid geometry');
   if(reaction.state==='orbit') assert(frame.arcs.length>0,'Orbit must render its rings');
   if(reaction.state==='notify') assert(frame.notif,'Notification must render its dot');
   if(reaction.state==='thinking') assert(frame.dots.length>0,'Thinking must render its dots');
+}
+for (let previous=-1;previous<IDLE_INTERLUDES.length;previous++) for (const sample of [0,.5,.999]) {
+  const next=chooseIdleInterlude(previous,()=>sample);
+  assert.notEqual(next.index,previous,'idle faces do not repeat consecutively');
+  assert(next.pause>=2400&&next.pause<=4000,'idle has a short natural rest');
 }
 const prior={status:'Chờ giao',paid:100};
 for(const [status,expected] of [['Đang giao','shipping'],['Đã giao','delivered'],['Đã hủy','cancelled'],['Đã hoàn','returned'],['Chờ hàng về','success']]) {
@@ -63,6 +68,7 @@ const hook={exports:{}};
 const hookCode=ts.transpileModule(readFileSync(new URL('../app/use-mascot-reactions.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 vm.runInNewContext(hookCode,{
   module:hook,exports:hook.exports,window:browser,document,
+  Math:{random:()=>0},
   sessionStorage:{getItem:k=>session.get(k),setItem:(k,v)=>session.set(k,v)},
   setTimeout:schedule,clearTimeout:id=>timers.delete(id),
   require:name=>name==='react'?{useState:value=>{current=value;return[value,next=>{current=next;}];},useEffect:fn=>{cleanup=fn();}}:load(resolve(root,'mascot-reactions.ts')),
@@ -81,7 +87,9 @@ advance(3000);assert.equal(current.expression,'neutre');
 advance(5000);assert.equal(current.state,'wink');
 advance(1600);assert.equal(current.state,'thinking');
 advance(2600);assert.equal(current.state,'wide');
-advance(1800);assert.equal(current.state,'wink','idle sequence repeats in order');
+advance(1800);assert.equal(current.expression,'curieux','core sequence leads to a playful face');
+advance(2000);assert.equal(current.expression,'neutre','mascot rests between combinations');
+advance(2400);assert.equal(current.state,'wink','idle sequence resumes after rest');
 document.dispatchEvent(new Event('pointerdown'));assert.equal(current.state,'idle','activity immediately stops idle effects');
 advance(8000);assert.equal(current.state,'wink');
 document.hidden=true;document.dispatchEvent(new Event('visibilitychange'));

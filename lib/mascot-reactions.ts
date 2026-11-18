@@ -8,6 +8,21 @@ export const IDLE_SEQUENCE: Reaction[] = [
   {state:'thinking',expression:'neutre',duration:2600,priority:0},
   {state:'wide',expression:'neutre',duration:1800,priority:0},
 ];
+export const IDLE_INTERLUDES: Reaction[] = [
+  {state:'idle',expression:'curieux',duration:2000,priority:0},
+  {state:'idle',expression:'heureux',duration:2200,priority:0},
+  {state:'idle',expression:'hilare',duration:2200,priority:0},
+  {state:'idle',expression:'surpris',duration:1800,priority:0},
+  {state:'idle',expression:'timide',duration:2400,priority:0},
+  {state:'idle',expression:'excite',duration:2000,priority:0},
+  {state:'idle',expression:'fier',duration:2200,priority:0},
+  {state:'idle',expression:'mefiant',duration:2000,priority:0},
+];
+export function chooseIdleInterlude(previous = -1, random = Math.random) {
+  const size=IDLE_INTERLUDES.length;
+  const index=previous<0?Math.floor(random()*size):(previous+1+Math.floor(random()*(size-1)))%size;
+  return {index,step:IDLE_INTERLUDES[index],pause:2400+Math.round(random()*1600)};
+}
 const pose = (state: StateId, expression: ExpressionId = 'neutre', duration = 2600, priority = 40): Reaction => ({state, expression, duration, priority});
 export const REACTIONS = {
   neutral: pose('idle', 'neutre', 1600),
