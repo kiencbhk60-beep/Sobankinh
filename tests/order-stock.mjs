@@ -19,4 +19,22 @@ let fifo=applyAction(applyAction(initial,order('first',4)),order('second',2));fi
 assert.throws(()=>applyAction(fifo,receipt('bad',3)));
 let legacy=structuredClone(initial);delete legacy.products[0].orderStock;assert.equal(availableOrder(legacy,legacy.products[0]),0);
 assert.equal(applyAction(legacy,order('old',1)).orders[0].status,'Chờ giao');
+// A web preorder keeps the existing confirmation -> receipt -> delivery lifecycle.
+const webAction=order('web',4);webAction.data.online=true;
+let web=applyAction(initial,webAction);
+assert.equal(web.orders[0].status,'Chờ xác nhận');
+assert.throws(()=>applyAction(web,{type:'update',data:{id:'web',status:'Chờ giao',paid:0}}));
+web=applyAction(web,{type:'update',data:{id:'web',status:'Chờ hàng về',paid:0}});
+assert.equal(web.products[0].stock,2);
+web=applyAction(web,receipt('web-receipt',2));
+assert.equal(web.orders[0].status,'Chờ giao');
+assert.equal(web.orders[0].lines[0].orderQty,0);
+web=applyAction(web,{type:'update',data:{id:'web',status:'Đang giao',paid:20}});
+assert.equal(web.products[0].stock,0);
+web=applyAction(web,{type:'update',data:{id:'web',status:'Đã giao',paid:80}});
+assert.equal(web.products[0].stock,0,'finishing delivery must not subtract inventory twice');
+assert.equal(web.orders[0].status,'Đã giao');
+web=applyAction(web,{type:'update',data:{id:'web',status:'Đã hoàn',paid:0}});
+assert.equal(web.products[0].stock,4);
+assert.equal(web.orders[0].status,'Đã hoàn');
 console.log('Order inventory tests passed');

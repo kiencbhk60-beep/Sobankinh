@@ -27,4 +27,13 @@ const invalid=await writeStore(db,{...order('invalid'),revision:1,data:{id:'inva
 const delivered=await writeStore(db,{type:'update',revision:1,requestId:crypto.randomUUID(),data:{id:winning.data.id,status:'Đã giao',paid:150000}});assert.equal(delivered.status,200);assert.equal(delivered.body.state.products[0].stock,0);
 const restart=await readStore(db);assert.equal(restart.revision,2);assert.equal(restart.state.orders[0].status,'Đã giao');assert.equal(restart.state.products[0].stock,0);
 assert.equal((await writeStore(db,{type:'reset',revision:2,requestId:crypto.randomUUID()})).status,400);
+const edited=await writeStore(db,{type:'update',revision:restart.revision,requestId:crypto.randomUUID(),data:{id:winning.data.id,status:'Đã giao',paid:100000,tracking:'QA-TRACK-001',note:'Đã cập nhật vận đơn'}});
+assert.equal(edited.status,200);
+assert.equal(edited.body.state.products[0].stock,0,'editing a delivered order cannot subtract inventory again');
+const reloaded=await readStore(db);
+const savedOrder=reloaded.state.orders.find(o=>o.id===winning.data.id);
+assert.equal(savedOrder.tracking,'QA-TRACK-001');
+assert.equal(savedOrder.paid,100000);
+assert.equal(savedOrder.note,'Đã cập nhật vận đơn');
+assert.equal(savedOrder.status,'Đã giao');
 console.log('Opening Inventory reconciled; persistent store, concurrent writes, stale edits, idempotent orders, invalid stock and delivery passed.');
