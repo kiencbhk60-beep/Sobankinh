@@ -16,7 +16,7 @@ Trang mới dùng `state.orders`; tìm theo mã đơn, tên khách không dấu,
 
 - `app/sales-app.tsx`: điều hướng Đơn hàng, bộ đếm đang xử lý, tiêu đề, liên kết tạo đơn và tích hợp OrdersPanel. Giữ modal, hàm CSV và form Bán hàng hiện có.
 - `app/orders-panel.tsx`: bộ đếm, pill trạng thái, tìm kiếm, bảng/thẻ, nút xác nhận và chi tiết.
-- `app/orders-panel.css`: giao diện responsive; màu xanh ngọc giới hạn trong trang Đơn hàng, focus bàn phím, thanh trạng thái cuộn riêng và giảm chuyển động theo tùy chọn hệ thống.
+- `app/orders-panel.css`: giao diện responsive; nút và bộ lọc dùng các biến màu chung `--accent`, `--accent-hover`, `--accent-soft`, `--accent-text` cho cả chế độ sáng/tối; có focus bàn phím, thanh trạng thái cuộn riêng và giảm chuyển động theo tùy chọn hệ thống.
 - `app/mobile-radial-navigation.tsx`, `tests/mobile-radial-navigation.mjs`: một điểm Đơn hàng, không còn Giao hàng/Xác nhận đơn hàng riêng; dùng bộ đếm chung. Bản bàn giao kế thừa menu năm mục và chỉnh màu navigation đã có trong commit đồng thời `5c4591d`.
 - `tests/orders-panel.mjs`: trạng thái, đếm số đơn, tìm kiếm kết hợp, đơn hoàn/hủy, khóa xác nhận khi chưa sẵn sàng và dữ liệu đầu vào bất biến.
 - `tests/order-stock.mjs`: bổ sung vòng đời đơn web order, nhận hàng, giao, hoàn và chống trừ tồn hai lần.
