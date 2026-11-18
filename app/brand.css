@@ -1,5 +1,6 @@
 /* TREKBROSS storefront palette: white, charcoal and signature orange. */
 :root {
+  color-scheme: light;
   --paper: #ffffff;
   --ink: #1b1d1b;
   --accent: #ef4d25;
@@ -15,18 +16,19 @@
   --lime: var(--accent-soft);
 }
 
-.sidebar { background: var(--ink); color: #e0e0e0; }
+.sidebar { background: var(--paper); color: var(--ink); border-right: 1px solid var(--line); }
+.brand { color: var(--ink); }
 .brand-icon { background: var(--accent); color: var(--ink); box-shadow: none; }
-.brand small, .nav-label, .nav, .profile small { color: #b9bcb7; }
-.nav:hover, .profile:hover { background: #30332f; color: #fff; }
-.nav.active { background: var(--accent); color: var(--ink); box-shadow: none; }
-.nav-count { background: var(--ink); color: #fff; }
-.sidebar-note { background: #252824; color: #d6d8d3; border-color: #41453e; }
-.sidebar-note b { color: #fff; }
-.sidebar-note p { color: #b9bcb7; }
-.store-branch, .profile-subnav { border-color: #41453e; }
-.profile { color: #e0e0e0; }
-.profile>span { background: #30332f; border-color: #53574f; color: #fff; }
+.brand small, .nav-label, .nav, .profile small { color: var(--muted); }
+.nav:hover, .profile:hover { background: var(--surface); color: var(--ink); }
+.nav.active { background: var(--accent-soft); color: var(--accent-text); box-shadow: none; }
+.nav-count { background: var(--ink); color: var(--paper); }
+.sidebar-note { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.sidebar-note b { color: var(--ink); }
+.sidebar-note p { color: var(--muted); }
+.store-branch, .profile-subnav { border-color: var(--line); }
+.profile { color: var(--ink); }
+.profile>span { background: var(--surface); border-color: var(--line); color: var(--ink); }
 
 .topbar, .panel, .order-panel, .metrics>div, .product-card,
 .search, .secondary, .chip { background: var(--paper); border-color: var(--line); }
