@@ -8,7 +8,7 @@ const transpile=(p)=>ts.transpileModule(readFileSync(p,'utf8'),{compilerOptions:
 const seed=JSON.parse(readFileSync('app/seed.json','utf8'));
 
 const domainUri=uri(transpile('app/domain.ts'));
-const {SHOP_PRODUCT_MAP,available,sellable,total,lineCost}=await import(domainUri);
+const {SHOP_PRODUCT_MAP,available,sellable,total,lineCost,DELIVERY_STATUSES}=await import(domainUri);
 
 const storeServiceCode=transpile('app/store-service.ts')
  .replace("import seed from './seed.json';",'const seed='+JSON.stringify(seed)+';')
@@ -222,6 +222,7 @@ assert.ok(recordedSingle);
 assert.equal(recordedSingle.customer,'Trần Minh Hoàng');
 assert.equal(recordedSingle.seller,'Web Cincacao');
 assert.equal(recordedSingle.status,'Chờ xác nhận');
+assert.ok(store.state.orders.filter(o=>DELIVERY_STATUSES.includes(o.status)).some(o=>o.id===recordedSingle.id),'New web orders must appear in the delivery queue before confirmation');
 assert.equal(recordedSingle.paid,0);
 assert.equal(lineCost(recordedSingle.lines[0]),82793); // FIFO cost preserved from opening lot of K-04!
 
@@ -234,6 +235,7 @@ res=await writeStore(db,{
 });
 assert.equal(res.status,200);
 assert.equal(res.body.state.orders.find(o=>o.id===recordedSingle.id).status,'Chờ giao');
+assert.ok(res.body.state.orders.filter(o=>DELIVERY_STATUSES.includes(o.status)).some(o=>o.id===recordedSingle.id),'Confirming an order must keep it in the same delivery queue');
 
 res=await writeStore(db,{
  type:'update',
@@ -244,6 +246,7 @@ res=await writeStore(db,{
 assert.equal(res.status,200);
 // Stock of K-04 physically decremented from 2 to 1 when entering Đang giao
 assert.equal(res.body.state.products.find(p=>p.code==='K-04').stock,1);
+assert.ok(res.body.state.orders.filter(o=>DELIVERY_STATUSES.includes(o.status)).some(o=>o.id===recordedSingle.id),'Orders being shipped remain in the delivery queue');
 
 res=await writeStore(db,{
  type:'update',
@@ -253,6 +256,7 @@ res=await writeStore(db,{
 });
 assert.equal(res.status,200);
 assert.equal(res.body.state.orders.find(o=>o.id===recordedSingle.id).status,'Đã giao');
+assert.equal(res.body.state.orders.filter(o=>DELIVERY_STATUSES.includes(o.status)).some(o=>o.id===recordedSingle.id),false,'Completed orders must leave the delivery queue');
 
 // Cancel multiOrder (Chờ xác nhận -> Đã hủy) and verify FIFO lots & availability are restored
 res=await writeStore(db,{
@@ -274,11 +278,10 @@ const k08=store.state.products.find(p=>p.code==='K-08');
 assert.equal(k08.stock,2);
 assert.equal(k08.cost,42893);
 
-// 10. Verify Trekbross app.js mapping & sales-app.tsx routing for "Xác nhận đơn hàng"
+// 10. Verify storefront mapping and removal of the separate confirmation tab.
 const salesAppCode=readFileSync('app/sales-app.tsx','utf8');
 assert.match(salesAppCode,/https:\/\/cincacao\.trekbross\.workers\.dev/,'Cửa hàng kính must link to Shopbankinh');
-assert.match(salesAppCode,/Xác nhận đơn hàng/,'Sidebar must include child branch "Xác nhận đơn hàng"');
-assert.match(salesAppCode,/tab==='Xác nhận đơn hàng'\?o\.status==='Chờ xác nhận':tab==='Giao hàng'\?\['Chờ hàng về','Chờ giao','Đang giao'\]\.includes\(o\.status\)/,'Chờ xác nhận orders must route to Xác nhận đơn hàng and not Giao hàng');
+assert.doesNotMatch(salesAppCode,/Xác nhận đơn hàng/,'Confirmation must no longer have a separate sidebar tab');
 const trekbrossAppJs=readFileSync('../Trekbross/app.js','utf8');
 for(const [shopKey,code] of Object.entries(SHOP_PRODUCT_MAP)){
  assert.match(trekbrossAppJs,new RegExp(`${shopKey}:\\s*"${code}"`),`Trekbross app.js must map ${shopKey} -> ${code}`);

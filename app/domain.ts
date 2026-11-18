@@ -17,6 +17,7 @@ export const SHOP_PRODUCT_MAP:Record<string,string>={
 };
 export const CODE_TO_SHOP_KEY:Record<string,string>=Object.fromEntries(Object.entries(SHOP_PRODUCT_MAP).map(([k,v])=>[v,k]));
 export const HELD_STATUSES=['Chờ xác nhận','Chờ giao','Chờ hàng về'];
+export const DELIVERY_STATUSES=['Chờ xác nhận','Chờ hàng về','Chờ giao','Đang giao'];
 export const packagingCatalog=[
  {code:'HO-01',name:'Hộp to',unit:'cái'},
  {code:'HO-02',name:'Hộp nhỏ',unit:'cái'},
