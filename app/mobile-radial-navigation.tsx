@@ -1,19 +1,17 @@
 'use client';
 
 import {useEffect, useRef, useState, type CSSProperties} from 'react';
-import {LayoutDashboard, ShoppingBag, Coins, ClipboardList, Package, Truck, Glasses, ShieldCheck, Plus} from 'lucide-react';
+import {LayoutDashboard, ShoppingBag, Coins, ClipboardList, Package, Plus} from 'lucide-react';
 import './mobile-radial-navigation.css';
 
 type Props = {
   tab: string;
   onNavigate: (tab: string) => void;
-  deliveryCount: number;
-  pendingConfirm: number;
-  shopURL: string;
+  openOrderCount: number;
   modalOpen: boolean;
 };
 
-export default function MobileRadialNavigation({tab, onNavigate, deliveryCount, pendingConfirm, shopURL, modalOpen}: Props) {
+export default function MobileRadialNavigation({tab, onNavigate, openOrderCount, modalOpen}: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -25,11 +23,8 @@ export default function MobileRadialNavigation({tab, onNavigate, deliveryCount, 
     {label: 'Dashboard', Icon: LayoutDashboard},
     {label: 'Bán hàng', Icon: ShoppingBag},
     {label: 'Lịch sử nhập hàng', Icon: Coins},
-    {label: 'Đơn hàng', Icon: ClipboardList},
+    {label: 'Đơn hàng', Icon: ClipboardList, count: openOrderCount},
     {label: 'Kho hàng', Icon: Package},
-    {label: 'Giao hàng', Icon: Truck, count: deliveryCount},
-    {label: 'Cửa hàng kính', Icon: Glasses, href: shopURL},
-    {label: 'Xác nhận đơn hàng', Icon: ShieldCheck, count: pendingConfirm},
   ];
 
   function close(immediate = false) {
@@ -99,8 +94,7 @@ export default function MobileRadialNavigation({tab, onNavigate, deliveryCount, 
   }, [tab, modalOpen]);
 
   const style = {'--radial-lift': `${lift}px`} as CSSProperties;
-  // Pending confirmations already belong to the delivery queue.
-  const notifications = deliveryCount;
+  const notifications = openOrderCount;
   return <div className="mobile-radial" style={style} hidden={modalOpen}>
     <button ref={trigger} type="button" className="radial-toggle radial-launcher" aria-label="Mở menu điều hướng" aria-haspopup="dialog" aria-expanded={expanded} aria-controls="mobile-radial-dialog" onClick={open}>
       <Plus size={27} aria-hidden="true"/>
@@ -108,18 +102,16 @@ export default function MobileRadialNavigation({tab, onNavigate, deliveryCount, 
     </button>
     <dialog ref={dialog} id="mobile-radial-dialog" className={`radial-dialog${expanded ? ' is-expanded' : ''}`} aria-label="Điều hướng Sổ bán kính" onCancel={event => { event.preventDefault(); close(); }} onClick={event => { if (event.target === event.currentTarget) close(); }} onClose={() => { setExpanded(false); reposition.current(); trigger.current?.focus({preventScroll: true}); }}>
       <nav className="radial-items" aria-label="Chức năng Sổ bán kính" inert={!expanded}>
-        {items.map(({label, Icon, count, href}, index) => {
-          const outer = index < 5;
-          const angle = (outer ? index * 22.5 : (index - 5) * 45) * Math.PI / 180;
+        {items.map(({label, Icon, count}, index) => {
+          const angle = index * (90 / (items.length - 1)) * Math.PI / 180;
           const itemStyle = {
-            '--radial-radius': outer ? 'var(--radial-outer)' : '112px',
+            '--radial-radius': 'var(--radial-outer)',
             '--radial-x': -Math.cos(angle), '--radial-y': -Math.sin(angle),
-            '--radial-order': index, '--radial-reverse': 7 - index,
+            '--radial-order': index, '--radial-reverse': items.length - 1 - index,
           } as CSSProperties;
           const content = <><span className="radial-circle"><Icon size={22} aria-hidden="true"/>{!!count && <span className="radial-count">{count}</span>}</span><span className="radial-label">{label}</span></>;
           const className = `radial-item${tab === label ? ' is-selected' : ''}`;
-          return href ? <a key={label} className={className} href={href} style={itemStyle} onClick={() => close(true)}>{content}</a>
-            : <button key={label} type="button" className={className} style={itemStyle} aria-current={tab === label ? 'page' : undefined} onClick={() => { onNavigate(label); close(); }}>{content}</button>;
+          return <button key={label} type="button" className={className} style={itemStyle} aria-current={tab === label ? 'page' : undefined} onClick={() => { onNavigate(label); close(); }}>{content}</button>;
         })}
       </nav>
       <button type="button" className="radial-toggle radial-close" aria-label="Đóng menu điều hướng" onClick={() => close()} autoFocus><Plus size={27} aria-hidden="true"/></button>

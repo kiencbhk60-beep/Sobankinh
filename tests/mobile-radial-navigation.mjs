@@ -19,20 +19,21 @@ vm.runInNewContext(compiled, {
   require: name => name.endsWith('.css') ? {} : localRequire(name),
 });
 const Navigation = loaded.exports.default;
-const props = {tab: 'Dashboard', onNavigate() {}, deliveryCount: 0, pendingConfirm: 0, shopURL: 'https://store.example.test/', modalOpen: false};
+const props = {tab: 'Dashboard', onNavigate() {}, openOrderCount: 0, modalOpen: false};
 const render = overrides => renderToStaticMarkup(React.createElement(Navigation, {...props, ...overrides}));
 const empty = render({});
-assert.equal((empty.match(/class="radial-item[" ]/g) || []).length, 8);
-for (const label of ['Dashboard', 'Bán hàng', 'Lịch sử nhập hàng', 'Đơn hàng', 'Kho hàng', 'Giao hàng', 'Cửa hàng kính', 'Xác nhận đơn hàng']) {
+assert.equal((empty.match(/class="radial-item[" ]/g) || []).length, 5);
+for (const label of ['Dashboard', 'Bán hàng', 'Lịch sử nhập hàng', 'Đơn hàng', 'Kho hàng']) {
   assert(empty.includes(`<span class="radial-label">${label}</span>`), `${label} is available`);
 }
-assert(empty.includes(`href="${props.shopURL}"`), 'shop keeps its supplied destination');
+assert(!empty.includes('<a '), 'mobile navigation has no storefront shortcut');
 assert(!empty.includes('class="radial-count"'), 'zero notifications hide badges');
-const pending = render({deliveryCount: 14, pendingConfirm: 9, tab: 'Xác nhận đơn hàng'});
-assert(pending.includes('Thông báo: </span>14</span>'), 'launcher does not double count pending confirmations');
-assert(pending.includes('class="radial-count">14</span>'), 'delivery badge uses its input');
-assert(pending.includes('class="radial-count">9</span>'), 'confirmation badge uses its input');
+assert(!empty.includes('<span class="radial-label">Giao hàng</span>'));
+assert(!empty.includes('<span class="radial-label">Xác nhận đơn hàng</span>'));
+const pending = render({openOrderCount: 14, tab: 'Đơn hàng'});
+assert(pending.includes('Thông báo: </span>14</span>'), 'launcher counts the unified active queue once');
+assert(pending.includes('class="radial-count">14</span>'), 'unified orders badge uses its input');
 assert.equal((pending.match(/aria-current="page"/g) || []).length, 1, 'exactly one section is selected');
 assert(pending.includes('aria-current="page"'), 'active state remains accessible');
 assert(render({modalOpen: true}).includes('hidden=""'), 'form dialogs hide the launcher');
-console.log('PASS: all eight destinations, supplied URL, notification badges, active section and modal visibility.');
+console.log('PASS: five unified destinations, no storefront shortcut, order badges, active section and modal visibility.');

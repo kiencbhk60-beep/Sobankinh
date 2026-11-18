@@ -278,9 +278,9 @@ const k08=store.state.products.find(p=>p.code==='K-08');
 assert.equal(k08.stock,2);
 assert.equal(k08.cost,42893);
 
-// 10. Verify storefront mapping and removal of the separate confirmation tab.
+// 10. Verify storefront mapping and removal of separate navigation shortcuts.
 const salesAppCode=readFileSync('app/sales-app.tsx','utf8');
-assert.match(salesAppCode,/https:\/\/cincacao\.trekbross\.workers\.dev/,'Cửa hàng kính must link to Shopbankinh');
+assert.doesNotMatch(salesAppCode,/https:\/\/cincacao\.trekbross\.workers\.dev/,'The removed storefront navigation shortcut must not return');
 assert.doesNotMatch(salesAppCode,/Xác nhận đơn hàng/,'Confirmation must no longer have a separate sidebar tab');
 const trekbrossAppJs=readFileSync('../Trekbross/app.js','utf8');
 for(const [shopKey,code] of Object.entries(SHOP_PRODUCT_MAP)){
