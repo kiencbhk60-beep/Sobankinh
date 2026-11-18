@@ -1,0 +1,38 @@
+/* Lucian UX/UI Prompt #219 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#219 */
+.u219-tg{width:44px;height:44px;flex:none;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.u219-tg svg{width:20px;height:20px;transition:transform .6s cubic-bezier(.3,1.4,.5,1)}
+[data-theme=dark] .u219-tg svg{transform:rotate(-90deg)}
+.u219-tg:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+::view-transition-new(root){z-index:1}::view-transition-old(root){z-index:0}
+
+.server-status{display:grid;place-items:center;width:16px;height:44px;flex:none}
+.server-status-dot{display:block;width:9px;height:9px;border-radius:50%;background:#ef4444}
+.server-status.connected .server-status-dot{background:#10b981}
+.server-status.connecting .server-status-dot{background:#eab308}
+.server-status-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+html[data-theme=dark]{color-scheme:dark;--paper:#181b1a;--ink:#f4f0e5;--line:#50554f;--accent:#ef642f;--accent-hover:#d95122;--accent-soft:#362b24;--accent-text:#ffad7d;--muted:#bec5bb;--surface:#222824;--bg:var(--paper)}
+[data-theme=dark] :is(.topbar,.modal){background:var(--paper);color:var(--ink)}
+[data-theme=dark] .brand-icon{color:#171a17}
+[data-theme=dark] .metrics .metric-dark{background:var(--surface);border-color:var(--line)}
+[data-theme=dark] .metrics .metric-dark strong{color:var(--ink)}
+[data-theme=dark] .order-panel>.section-head{background:var(--surface);color:var(--ink)}
+[data-theme=dark] .chip.selected{background:var(--accent-soft);color:var(--accent-text);border-color:var(--accent)}
+[data-theme=dark] .primary,[data-theme=dark] .mobile-cart{color:#171a17}
+[data-theme=dark] :is(.orders-heading,.orders-panel) .primary{color:#fff}
+[data-theme=dark] .toast{background:var(--surface);color:var(--ink);border-color:var(--line)}
+[data-theme=dark] :is(.product-photo,.table-product img){background:var(--surface)}
+[data-theme=dark] .add-circle{background:var(--paper)}
+[data-theme=dark] .in-cart .add-circle{background:var(--accent);color:#171a17}
+[data-theme=dark] :is(.notice,.demo-banner){border-color:var(--line)}
+[data-theme=dark] .error{background:#362a22;color:#ffcc99;border-color:#64503a}
+[data-theme=dark] .error button,[data-theme=dark] .error a{color:#ffcc99}
+[data-theme=dark] input::placeholder{color:#a7afa3}
+[data-theme=dark] .orders-panel{--orders-soft:#193c3d}
+[data-theme=dark] .order-toolbar h2>span{color:#88e0d8}
+[data-theme=dark] .order-filter:not(.selected):hover{background:var(--surface);border-color:var(--line)}
+[data-theme=dark] .u009{--ux-accent-ink:#171a17}
+[data-theme=dark] .radial-toggle,[data-theme=dark] .radial-circle{color:#171a17}
+[data-theme=dark] .is-selected .radial-circle{color:var(--accent-text)}
+@media(prefers-reduced-motion:reduce){.u219-tg svg{transition:none}}
