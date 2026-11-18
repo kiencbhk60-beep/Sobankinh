@@ -4,7 +4,7 @@
 import {useState, type CSSProperties} from 'react';
 import './rolling-shop-button.css';
 
-export const SHOP_URL = 'https://cincacao.trekbross.workers.dev/shop.html#top';
+export const SHOP_URL = 'https://cincacao.trekbross.workers.dev/';
 
 function Face({text}: {text: string}) {
   return <span className="u009-face">{Array.from(text).map((character, index) => {
