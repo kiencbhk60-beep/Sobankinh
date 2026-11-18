@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createRequire} from 'node:module';
+import vm from 'node:vm';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import ts from 'typescript';
+
+// Render the real component with isolated notification inputs, without touching store data.
+const sourceURL = new URL('../app/mobile-radial-navigation.tsx', import.meta.url);
+const source = readFileSync(sourceURL, 'utf8');
+const compiled = ts.transpileModule(source, {compilerOptions: {
+  jsx: ts.JsxEmit.ReactJSX, module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022,
+}}).outputText;
+const localRequire = createRequire(sourceURL);
+const loaded = {exports: {}};
+vm.runInNewContext(compiled, {
+  module: loaded, exports: loaded.exports,
+  require: name => name.endsWith('.css') ? {} : localRequire(name),
+});
+const Navigation = loaded.exports.default;
+const props = {tab: 'Dashboard', onNavigate() {}, deliveryCount: 0, pendingConfirm: 0, shopURL: 'https://store.example.test/', modalOpen: false};
+const render = overrides => renderToStaticMarkup(React.createElement(Navigation, {...props, ...overrides}));
+const empty = render({});
+assert.equal((empty.match(/class="radial-item[" ]/g) || []).length, 8);
+for (const label of ['Dashboard', 'Bán hàng', 'Lịch sử nhập hàng', 'Đơn hàng', 'Kho hàng', 'Giao hàng', 'Cửa hàng kính', 'Xác nhận đơn hàng']) {
+  assert(empty.includes(`<span class="radial-label">${label}</span>`), `${label} is available`);
+}
+assert(empty.includes(`href="${props.shopURL}"`), 'shop keeps its supplied destination');
+assert(!empty.includes('class="radial-count"'), 'zero notifications hide badges');
+const pending = render({deliveryCount: 14, pendingConfirm: 9, tab: 'Xác nhận đơn hàng'});
+assert(pending.includes('Thông báo: </span>14</span>'), 'launcher does not double count pending confirmations');
+assert(pending.includes('class="radial-count">14</span>'), 'delivery badge uses its input');
+assert(pending.includes('class="radial-count">9</span>'), 'confirmation badge uses its input');
+assert.equal((pending.match(/aria-current="page"/g) || []).length, 1, 'exactly one section is selected');
+assert(pending.includes('aria-current="page"'), 'active state remains accessible');
+assert(render({modalOpen: true}).includes('hidden=""'), 'form dialogs hide the launcher');
+console.log('PASS: all eight destinations, supplied URL, notification badges, active section and modal visibility.');
