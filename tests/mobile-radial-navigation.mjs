@@ -7,16 +7,21 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import ts from 'typescript';
 
 // Render the real component with isolated notification inputs, without touching store data.
-const sourceURL = new URL('../app/mobile-radial-navigation.tsx', import.meta.url);
+const sourceURL = new URL('../app/floating-navigation.tsx', import.meta.url);
 const source = readFileSync(sourceURL, 'utf8');
 const compiled = ts.transpileModule(source, {compilerOptions: {
   jsx: ts.JsxEmit.ReactJSX, module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022,
 }}).outputText;
 const localRequire = createRequire(sourceURL);
+const geometry = {exports: {}};
+vm.runInNewContext(ts.transpileModule(readFileSync(new URL('../lib/floating-navigation.ts', import.meta.url), 'utf8'), {
+  compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022},
+}).outputText, {module: geometry, exports: geometry.exports});
 const loaded = {exports: {}};
 vm.runInNewContext(compiled, {
   module: loaded, exports: loaded.exports,
-  require: name => name.endsWith('.css') ? {} : localRequire(name),
+  require: name => name.endsWith('.css') ? {} : name === '../lib/floating-navigation' ? geometry.exports
+    : name === './mascot-avatar' ? {default: () => React.createElement('svg', {'data-mascot': true})} : localRequire(name),
 });
 const Navigation = loaded.exports.default;
 const props = {tab: 'Dashboard', onNavigate() {}, openOrderCount: 0, modalOpen: false};
