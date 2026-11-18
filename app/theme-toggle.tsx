@@ -4,6 +4,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {flushSync} from 'react-dom';
 import './theme.css';
+import {reactTo} from '../lib/mascot-reactions';
 
 export default function ThemeToggle() {
   const [dark, setDark] = useState(false);
@@ -19,6 +20,7 @@ export default function ThemeToggle() {
 
   async function toggle() {
     if (busy.current || !button.current) return;
+    reactTo('theme');
     const root = document.documentElement;
     const next = !dark;
     const sync = () => {

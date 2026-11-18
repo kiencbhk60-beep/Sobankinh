@@ -3,12 +3,13 @@
 import {useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent} from 'react';
 import {LayoutDashboard, ShoppingBag, Coins, ClipboardList, Package, X} from 'lucide-react';
 import MascotAvatar from './mascot-avatar';
+import {REACTIONS, reactTo, type Reaction} from '../lib/mascot-reactions';
 import {POSITION_KEY, defaultAnchor, clampAnchor, loadAnchor, saveAnchor, avoidActions, navigationLayout, type Point, type Viewport} from '../lib/floating-navigation';
 import './floating-navigation.css';
 
-type Props = {tab: string; onNavigate: (tab: string) => void; openOrderCount: number; modalOpen: boolean};
+type Props = {tab: string; onNavigate: (tab: string) => void; openOrderCount: number; modalOpen: boolean; reaction?: Reaction};
 
-export default function FloatingNavigation({tab, onNavigate, openOrderCount, modalOpen}: Props) {
+export default function FloatingNavigation({tab, onNavigate, openOrderCount, modalOpen, reaction = REACTIONS.neutral}: Props) {
   const dialog = useRef<HTMLDialogElement>(null), trigger = useRef<HTMLButtonElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const frame = useRef(0), pointerFrame = useRef(0), suppressClick = useRef(false);
@@ -38,6 +39,7 @@ export default function FloatingNavigation({tab, onNavigate, openOrderCount, mod
     if (current.current) try { localStorage.setItem(POSITION_KEY, saveAnchor(current.current, viewport.current)); } catch {}
   }
   function close(immediate = false) {
+    if (dialog.current?.open && !immediate) reactTo('menu.close');
     cancelAnimationFrame(frame.current);
     clearTimeout(timer.current);
     setExpanded(false);
@@ -107,6 +109,7 @@ export default function FloatingNavigation({tab, onNavigate, openOrderCount, mod
     cancelAnimationFrame(pointerFrame.current);
     if (start.moved) move({x: start.start.x + event.clientX - start.x, y: start.start.y + event.clientY - start.y}, true);
     suppressClick.current = start.moved;
+    if (start.moved) reactTo('drag.end');
     drag.current = null; setDragging(false);
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     remember();
@@ -122,7 +125,7 @@ export default function FloatingNavigation({tab, onNavigate, openOrderCount, mod
         if (event.key === 'Home') { event.preventDefault(); move(defaultAnchor(viewport.current), true); remember(); }
         else if (deltas[event.key] && current.current) { event.preventDefault(); const d=deltas[event.key]; move({x:current.current.x+d.x,y:current.current.y+d.y},true); remember(); }
       }}>
-      <MascotAvatar active={!present}/>
+      <MascotAvatar active={!present&&!modalOpen} reaction={dragging ? REACTIONS['drag.end'] : reaction}/>
       {openOrderCount > 0 && <span className="radial-count"><span className="radial-sr-only">Thông báo: </span>{openOrderCount}</span>}
     </button>
     <dialog ref={dialog} id="ledger-radial-dialog" style={{'--radial-left': `${layout.anchor.x}px`, '--radial-top': `${layout.anchor.y}px`} as CSSProperties} className={`radial-dialog${expanded ? ' is-expanded' : ''}`} aria-label="Điều hướng Sổ bán kính" onCancel={event => {event.preventDefault();close();}} onClick={event=>{if(event.target===event.currentTarget)close();}} onClose={()=>{setExpanded(false);setPresent(false);reposition.current();trigger.current?.focus({preventScroll:true});}}>
@@ -135,7 +138,7 @@ export default function FloatingNavigation({tab, onNavigate, openOrderCount, mod
           </button>;
         })}
       </nav>
-      <button type="button" className="radial-toggle radial-close" aria-label="Đóng menu điều hướng" onClick={()=>close()} autoFocus><MascotAvatar active={present}/><span className="radial-close-mark" aria-hidden="true"><X size={14}/></span></button>
+      <button type="button" className="radial-toggle radial-close" aria-label="Đóng menu điều hướng" onClick={()=>close()} autoFocus><MascotAvatar active={present} reaction={REACTIONS['menu.close']}/><span className="radial-close-mark" aria-hidden="true"><X size={14}/></span></button>
     </dialog>
   </div>;
 }

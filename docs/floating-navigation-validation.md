@@ -4,7 +4,7 @@ Menu vòng cung dùng chung trên điện thoại, tablet và desktop; sidebar �
 
 Nhấn mascot mở menu; kéo từ 5px trở lên chỉ di chuyển, không mở menu. Lưu vị trí tương đối trong localStorage, giới hạn trong màn hình. Menu đổi hướng và dùng thêm tầng cung nếu cần. Mascot tránh các ô nhập và nút thao tác quan trọng khi thả/cuộn. Khi mở biểu mẫu, ẩn mascot. Escape, dấu X hoặc nhấn ngoài đóng menu; focus trả về nút mở. Phím mũi tên di chuyển, Shift tăng bước, Home đặt lại.
 
-Engine Bloub giữ nguyên hằng số gốc; giấy phép và revision trong lib/bloub. Hiện chỉ có biểu cảm trung tính, chớp mắt và nhìn theo con trỏ. Chưa gắn biểu cảm với nghiệp vụ, chờ chủ cửa hàng chọn.
+Engine Bloub giữ nguyên hằng số gốc; giấy phép và revision trong lib/bloub. Biểu cảm theo lựa chọn chủ cửa hàng được khai báo riêng trong lib/mascot-reactions.ts và điều phối ở app/use-mascot-reactions.ts.
 
 ## Kiểm tra
 
@@ -19,7 +19,7 @@ Engine Bloub giữ nguyên hằng số gốc; giấy phép và revision trong li
 
 Thuật toán chọn từng chỗ trống trước đây tạo các bán kính tùy ý, khiến menu phân tán dù không chồng hình chữ nhật kiểm thử. Thay bằng kiểm tra nguyên bộ cung có bước góc đều; ưu tiên nhãn cùng phía, dùng hai tầng đồng tâm nếu một tầng không vừa. Dành khoảng trống 8px giữa vùng bao gồm cả viền/huy hiệu. Trên màn hình quá thấp, tâm menu mở tạm dịch đến vị trí an toàn gần nhất; vị trí kéo đã lưu không thay đổi. Không ném lỗi render nếu màn hình co rất nhỏ.
 
-## Các tương tác để chọn biểu cảm sau
+## Mã tương tác
 
 | Mã | Sự kiện web |
 |---|---|
@@ -48,4 +48,33 @@ Thuật toán chọn từng chỗ trống trước đây tạo các bán kính t
 | 23 | Mở shop kính |
 | 24 | Không thao tác một khoảng thời gian / quay lại tab |
 
-Các trạng thái thành công chỉ được kích hoạt sau phản hồi thật của hệ thống nếu được chọn để triển khai. Chưa thêm polling hoặc thông báo thời gian thực.
+## Biểu cảm đã gắn
+
+| Mã | Hiệu ứng |
+|---|---|
+| 01 | Notification một lần trong mỗi phiên trình duyệt |
+| 02 | Orbit giữ suốt lúc menu mở; tiếp tục một chu kỳ khi đóng |
+| 03 | Wide eyes khi kéo và sau khi thả |
+| 04–05 | Giữ trung tính, chưa chọn hiệu ứng riêng |
+| 06 | Thinking khi tìm kính, kể cả không có kết quả |
+| 07 | Happy khi thêm kính thành công vào giỏ |
+| 08 | Neutral khi tăng/giảm số lượng, xóa dòng giỏ |
+| 09 | Curious khi đổi vật tư đóng gói |
+| 10 | Attentive khi nhập thông tin, Alert khi form không hợp lệ |
+| 11 | Thinking đến khi có kết quả; Happy thành công, Alert lỗi |
+| 12 | Exclamation khi không đủ tồn |
+| 13 | Attentive khi tìm/lọc/xem đơn |
+| 14 | Wink sau xác nhận thành công |
+| 15 | Chờ giao/nhận hàng: Happy; đang giao: Comet; đã giao: Proud; hủy: Sad; hoàn: Attentive |
+| 16 | Happy sau khi lưu số tiền đã thu thành công |
+| 17–18 | Mở nhập hàng: Curious, mở sửa sản phẩm: Attentive; lưu thành công: Happy, lỗi: Alert |
+| 19 | Thinking khi làm mới, Notification nếu phát hiện ID đơn mới sau phản hồi máy chủ |
+| 20 | Thinking đang kết nối, Wink kết nối được, Alert mất kết nối |
+| 21 | Wink khi chuyển sáng/tối |
+| 22 | Proud khi xuất/sao lưu tệp |
+| 23 | Comet khi mở shop |
+| 24 | Sleep sau 60 giây không thao tác, Notification khi thao tác lại hoặc quay lại tab |
+
+Orbit trong menu được ưu tiên hơn mọi phản ứng nghiệp vụ. Sự kiện kết nối thụ động không che mất thông báo lỗi/thành công. Trong biểu mẫu, mascot nhỏ nằm ở tiêu đề, không cản nút lưu hoặc nhập liệu. Giảm chuyển động: vẽ khung tĩnh của hiệu ứng được chọn; không chạy requestAnimationFrame. Khi ẩn tab thì tạm dừng animation. Dọn timer và listener khi unmount.
+
+Các trạng thái thành công chỉ được kích hoạt sau phản hồi thật của hệ thống. Không thêm polling, dữ liệu mẫu mới hoặc thay đổi API/quy tắc nghiệp vụ. tests/mascot-reactions.mjs kiểm tra các lựa chọn, vòng Orbit/hạt Notification/Thinking, phân loại kết quả lưu, ưu tiên, thử lại sau lỗi, timeout về trung tính, ngủ/thức và dọn tài nguyên.

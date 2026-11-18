@@ -2,5 +2,5 @@ Bloub engine, MIT (c) 2026 Jérémy Perret.
 Source: https://github.com/jeremy-prt/bloub
 Revision: b4bb3c1b5f93c7b87a2e8d620f667c4093d97749
 Framework-free src/bot TypeScript modules, copied without changes to measured constants.
-Sổ bán kính supplies its own circular orange body, black eye rendering and draggable navigation.
-Business-event expression mappings are intentionally not configured pending the owner's selection.
+Sổ bán kính supplies the orange palette, black eye rendering and draggable navigation.
+Business-event mappings live in lib/mascot-reactions.ts, outside the unchanged upstream engine.

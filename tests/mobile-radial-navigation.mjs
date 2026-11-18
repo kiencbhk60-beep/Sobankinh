@@ -14,6 +14,10 @@ const compiled = ts.transpileModule(source, {compilerOptions: {
 }}).outputText;
 const localRequire = createRequire(sourceURL);
 const geometry = {exports: {}};
+const reactions = {exports: {}};
+vm.runInNewContext(ts.transpileModule(readFileSync(new URL('../lib/mascot-reactions.ts', import.meta.url), 'utf8'), {
+  compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022},
+}).outputText, {module: reactions, exports: reactions.exports});
 vm.runInNewContext(ts.transpileModule(readFileSync(new URL('../lib/floating-navigation.ts', import.meta.url), 'utf8'), {
   compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022},
 }).outputText, {module: geometry, exports: geometry.exports});
@@ -21,6 +25,7 @@ const loaded = {exports: {}};
 vm.runInNewContext(compiled, {
   module: loaded, exports: loaded.exports,
   require: name => name.endsWith('.css') ? {} : name === '../lib/floating-navigation' ? geometry.exports
+    : name === '../lib/mascot-reactions' ? reactions.exports
     : name === './mascot-avatar' ? {default: () => React.createElement('svg', {'data-mascot': true})} : localRequire(name),
 });
 const Navigation = loaded.exports.default;

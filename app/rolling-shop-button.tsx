@@ -3,6 +3,7 @@
 
 import {useState, type CSSProperties} from 'react';
 import './rolling-shop-button.css';
+import {reactTo} from '../lib/mascot-reactions';
 
 export const SHOP_URL = 'https://cincacao.trekbross.workers.dev/';
 
@@ -17,7 +18,7 @@ export default function RollingShopButton() {
   const [selected, setSelected] = useState(false);
   return <span className={`u009${selected ? ' is-on' : ''}`}>
     <a className="u009-btn" href={SHOP_URL} target="_blank" rel="noopener noreferrer" role="button" aria-pressed={selected}
-      onClick={() => setSelected(current => !current)}
+      onClick={() => {setSelected(current => !current);reactTo('shop');}}
       onKeyDown={event => { if (event.key === ' ') { event.preventDefault(); event.currentTarget.click(); } }}>
       <span className="u009-fill" aria-hidden="true"/>
       <span className="u009-word" aria-hidden="true"><Face text="Mở shop kính"/><Face text="Đã mở shop"/></span>
