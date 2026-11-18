@@ -1,0 +1,118 @@
+/* TREKBROSS storefront palette: white, charcoal and signature orange. */
+:root {
+  --paper: #ffffff;
+  --ink: #1b1d1b;
+  --accent: #ef4d25;
+  --accent-hover: #d9431c;
+  --accent-soft: #fff0eb;
+  --accent-text: #b83212;
+  --muted: #62665f;
+  --line: #e0e0e0;
+  --surface: #f6f6f5;
+  --bg: var(--paper);
+  /* Existing components share these legacy palette aliases. */
+  --green: var(--accent);
+  --lime: var(--accent-soft);
+}
+
+.sidebar { background: var(--ink); color: #e0e0e0; }
+.brand-icon { background: var(--accent); color: var(--ink); box-shadow: none; }
+.brand small, .nav-label, .nav, .profile small { color: #b9bcb7; }
+.nav:hover, .profile:hover { background: #30332f; color: #fff; }
+.nav.active { background: var(--accent); color: var(--ink); box-shadow: none; }
+.nav-count { background: var(--ink); color: #fff; }
+.sidebar-note { background: #252824; color: #d6d8d3; border-color: #41453e; }
+.sidebar-note b { color: #fff; }
+.sidebar-note p { color: #b9bcb7; }
+.store-branch, .profile-subnav { border-color: #41453e; }
+.profile { color: #e0e0e0; }
+.profile>span { background: #30332f; border-color: #53574f; color: #fff; }
+
+.topbar, .panel, .order-panel, .metrics>div, .product-card,
+.search, .secondary, .chip { background: var(--paper); border-color: var(--line); }
+.metrics>div, .product-card, .panel { box-shadow: 0 3px 12px #1b1d1b04; }
+.order-panel { box-shadow: 0 10px 35px #1b1d1b08; scrollbar-color: #d5d7d2 transparent; }
+.sync { background: var(--surface); color: var(--muted); }
+.heading p, .eyebrow, .metrics span, .metrics em, .metrics strong small,
+.search, .chip, .product-info small, .hint, label, summary,
+.checkout>div:first-child, .remaining, .checkout-note, .iconbtn,
+.line-title small, td small, .table-note, .empty, .empty-cart p,
+.order-customer p, footer, .report-filters p, .report-breakdown p,
+.packaging-picker p, .packaging-choice small { color: var(--muted); }
+
+.metrics span svg, .metrics>div:nth-child(2) span svg,
+.metrics>div:nth-child(3) span svg {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.metrics .metric-dark { background: var(--ink); border-color: var(--ink); }
+.metrics .metric-dark span, .metrics .metric-dark small,
+.metrics .metric-dark em { color: #d6d8d3; }
+.metrics .metric-dark span svg { color: #ffad7d; background: #ffffff15; }
+.metrics .metric-dark strong { color: #fff; }
+.section-head h2>span { background: var(--surface); color: var(--muted); }
+.textbtn { color: var(--accent-text); }
+.chip.selected { background: var(--ink); border-color: var(--ink); color: #fff; }
+.chip:hover { background: var(--surface); }
+.chip.selected:hover { background: #30332f; }
+
+.product-card:hover:not(:disabled) { border-color: var(--accent); box-shadow: 0 10px 24px #1b1d1b10; }
+.product-card.in-cart { border-color: var(--accent); background: var(--accent-soft); }
+.product-photo, .table-product img { background: #f2f2f2; }
+.add-circle { color: var(--ink); box-shadow: 0 3px 9px #1b1d1b2b; }
+.in-cart .add-circle { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+.product-info h3, .form-section h3, .empty-cart b, .remaining b,
+.line-title b, td, td b, .empty.large h3 { color: var(--ink); }
+.product-info p { color: var(--accent-text); border-color: var(--line); }
+.sold-out .product-info h3, .sold-out .product-info p,
+.stock-pill.out { color: var(--muted); }
+.stock-pill.out { background: var(--surface); }
+
+.order-panel>.section-head { background: var(--ink); color: #fff; }
+.order-panel h2 svg { color: #ffad7d; }
+.order-panel .soft-tag { background: #353a32; color: #eceee9; }
+.empty-cart, details, .checkout, .cart-line, .stepper,
+.panel>.section-head, td, .order-detail-line, footer { border-color: var(--line); }
+.empty-cart>span { background: var(--surface); color: var(--muted); }
+input, select, .price-input input { background: var(--paper); border-color: var(--line); color: var(--ink); }
+input::placeholder { color: #767a72; }
+input:focus, select:focus { background: var(--paper); border-color: var(--accent); box-shadow: 0 0 0 3px #ef4d2518; }
+button:focus-visible, a:focus-visible { outline-color: var(--accent); }
+.checkout strong { color: var(--ink); }
+.primary { background: var(--accent); border-color: var(--accent); color: var(--ink); box-shadow: none; }
+.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+.secondary { color: var(--ink); }
+.secondary:hover { background: var(--surface); border-color: #b8bcb4; }
+.iconbtn:hover { background: var(--accent-soft); color: var(--accent-text); }
+.stepper button { color: var(--ink); }
+.soft-tag { background: var(--surface); color: var(--muted); }
+th { background: var(--surface); color: var(--muted); }
+.notice, .demo-banner { background: var(--accent-soft); color: var(--ink); border-color: #f4c6b9; }
+.demo-banner p { color: var(--muted); }
+.toast { background: var(--ink); color: #fff; border-color: #41453e; box-shadow: 0 10px 35px #1b1d1b30; }
+.overlay { background: #1b1d1b65; }
+.modal { box-shadow: 0 24px 80px #1b1d1b33; }
+.modal>.section-head, .modal-footer { background: var(--surface); border-color: var(--line); }
+.order-detail-line b { color: var(--ink); }
+.mobile-cart { background: var(--accent); border-color: var(--accent); color: var(--ink); box-shadow: 0 7px 25px #1b1d1b20; }
+
+.report-secondary>div, .bar-track { background: var(--surface); }
+.report-secondary span { color: var(--muted); }
+.report-secondary b { color: var(--ink); }
+.bar-track>div { background: var(--accent); }
+.report-breakdown>div { border-color: var(--line); }
+.report-breakdown>div:last-of-type { color: var(--ink); }
+.packaging-picker { background: var(--surface); border-color: var(--line); }
+.packaging-picker summary, .cost-preview b, .packaging-details h3 { color: var(--ink); }
+.packaging-choice, .cost-preview { border-color: var(--line); }
+.packaging-details { background: var(--surface); }
+.inventory-categories button { background: var(--surface); border-color: var(--line); color: var(--ink); }
+.inventory-categories button.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+.inventory-categories button:focus-visible { outline-color: var(--accent); }
+
+@media (max-width: 700px) {
+  .sidebar { background: var(--paper); border-color: var(--line); box-shadow: 0 -4px 24px #1b1d1b08; }
+  .sidebar .nav, .sidebar .nav.subnav, .sidebar .profile { color: var(--muted); }
+  .sidebar .nav.active { background: var(--accent-soft); color: var(--accent-text); }
+  .sidebar .nav:hover, .sidebar .profile:hover { background: var(--surface); color: var(--ink); }
+}

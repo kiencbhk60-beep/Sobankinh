@@ -8,6 +8,7 @@ import Inventory from './inventory';
 import PackagingPicker from './packaging-picker';
 
 import './modern.css';
+import './brand.css';
 import {State,Product,Order,total,available,reserved,availableOrder,reservedOrder,sellable,applyAction,migrateFIFO,lineCost,migratePackaging,isPackaging,productUnit,packagingCost,orderCost,quoteFIFO} from './domain';
 
 const money=(n:number)=>new Intl.NumberFormat('vi-VN').format(n)+' ₫';
