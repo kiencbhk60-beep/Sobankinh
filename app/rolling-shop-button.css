@@ -1,0 +1,85 @@
+.u009 {
+  --ux-page: var(--paper, #fff);
+  --ux-ink: var(--ink, #1b1d1b);
+  --ux-accent: var(--accent, #ef4d25);
+  --ux-accent-ink: var(--ink, #1b1d1b);
+  --ux-grad: linear-gradient(120deg, var(--accent, #ef4d25), var(--accent-hover, #d9431c) 55%, var(--accent-text, #b83212));
+  --ux-ease: cubic-bezier(.2,.8,.2,1);
+  --ux-spring: cubic-bezier(.34,1.45,.64,1);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.u009, .u009 *, .u009 *::before, .u009 *::after { box-sizing: border-box; }
+.u009 .u009-btn {
+  position: relative; display: flex; align-items: center; gap: 16px;
+  height: 68px; padding: 0 10px 0 30px; border: 0; border-radius: 999px;
+  background: transparent; color: var(--ux-ink); overflow: hidden; isolation: isolate;
+  text-decoration: none; cursor: pointer; font: inherit;
+  box-shadow: inset 0 0 0 1.5px var(--ux-ink);
+  transition: transform .5s var(--ux-spring), color .45s var(--ux-ease);
+}
+.u009 .u009-btn:active { transform: scale(.96); }
+.u009 .u009-btn:focus-visible { outline: 2px solid var(--ux-accent); outline-offset: 5px; }
+.u009 .u009-fill {
+  position: absolute; inset: 0; z-index: -1; background: var(--ux-ink);
+  border-radius: 50% 50% 0 0/40% 40% 0 0; transform: translateY(102%);
+  transition: transform .7s var(--ux-ease), border-radius .7s var(--ux-ease);
+}
+.u009.is-on .u009-fill { transform: none; border-radius: 0; }
+.u009.is-on .u009-btn { color: var(--ux-page); }
+.u009 .u009-word { position: relative; display: flex; height: 26px; overflow: hidden; font-size: 20px; font-weight: 740; letter-spacing: -.03em; line-height: 26px; white-space: nowrap; }
+.u009 .u009-face>span { display: flex; flex-direction: column; transition: transform .55s var(--ux-ease); transition-delay: calc(var(--i) * 22ms); }
+.u009 .u009-face>span::after { content: attr(data-c); display: block; }
+.u009 .u009-btn:hover .u009-face>span, .u009 .u009-btn:focus-visible .u009-face>span { transform: translateY(-26px); }
+.u009 .u009-face { display: flex; transition: transform .6s var(--ux-spring), opacity .3s var(--ux-ease); }
+.u009 .u009-face+.u009-face { position: absolute; left: 0; top: 0; transform: translateY(110%); opacity: 0; }
+.u009.is-on .u009-face:first-child { transform: translateY(-110%); opacity: 0; }
+.u009.is-on .u009-face+.u009-face { transform: none; opacity: 1; }
+.u009 .u009-orb {
+  position: relative; width: 48px; height: 48px; flex: none; border-radius: 50%;
+  background: var(--ux-grad); color: var(--ux-accent-ink);
+  box-shadow: 0 8px 18px -8px color-mix(in srgb, var(--ux-accent) 60%, transparent);
+  overflow: hidden;
+  transition: background-color .45s var(--ux-ease), color .45s var(--ux-ease), transform .6s var(--ux-spring);
+}
+.u009.is-on .u009-orb { transform: rotate(90deg); }
+.u009 .u009-orb svg { position: absolute; left: 13px; top: 13px; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; transition: transform .55s var(--ux-ease); }
+.u009 .u009-orb svg+svg { transform: translate(-36px,36px); }
+.u009 .u009-btn:hover .u009-orb svg:first-child { transform: translate(36px,-36px); }
+.u009 .u009-btn:hover .u009-orb svg+svg { transform: none; transition-delay: .08s; }
+.u009 .u009-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* The app currently has a light palette; the element also supports the shop's dark palette locally. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not(.light) .u009 {
+    --ux-page: #181b1a; --ux-ink: #f4f0e5; --ux-accent: #ef642f; --ux-accent-ink: #171a17;
+    --ux-grad: linear-gradient(120deg, #ef642f, #ffad7d 55%, #b83212);
+    background: var(--ux-page); border-radius: 999px;
+  }
+}
+:root[data-theme="dark"] .u009, :root.dark .u009 {
+  --ux-page: #181b1a; --ux-ink: #f4f0e5; --ux-accent: #ef642f; --ux-accent-ink: #171a17;
+  --ux-grad: linear-gradient(120deg, #ef642f, #ffad7d 55%, #b83212);
+  background: var(--ux-page); border-radius: 999px;
+}
+@media (max-width: 700px) {
+  .u009 .u009-btn { height: 44px; gap: 8px; padding: 0 6px 0 12px; }
+  .u009 .u009-word { font-size: 12px; }
+  .u009 .u009-orb { width: 30px; height: 30px; }
+  .u009 .u009-orb svg { left: 4px; top: 4px; }
+}
+@media (max-width: 359px) {
+  .u009 .u009-btn { gap: 6px; padding-left: 10px; }
+  .u009 .u009-word { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .u009, .u009 *, .u009 *::before, .u009 *::after {
+    animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important; transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
