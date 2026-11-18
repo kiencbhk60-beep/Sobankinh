@@ -9,11 +9,15 @@ Engine Bloub giữ nguyên hằng số gốc; giấy phép và revision trong li
 ## Kiểm tra
 
 - TypeScript và production build đạt.
-- tests/floating-navigation.mjs: 81 vị trí ở các góc/trung tâm, điện thoại, tablet, desktop và ngang; nút và nhãn không chồng nhau, không vượt màn hình; lưu vị trí và tránh nút thao tác.
+- tests/floating-navigation.mjs: 729 vị trí trên lưới 9×9, điện thoại, tablet, desktop và ngang; nút và nhãn không chồng nhau, không vượt màn hình; lưu vị trí và tránh nút thao tác. Kiểm tra tối đa hai bán kính và góc cách đều trên mỗi cung, tính cả viền chọn/focus và huy hiệu thông báo.
 - tests/mobile-radial-navigation.mjs: năm mục, huy hiệu số đơn bằng đầu vào thực, active state và ẩn khi có modal.
 - Orca browser: 320/375/390/430/768/1440px, đủ năm nút/nhãn trong màn hình, không cuộn ngang. Kiểm tra nền sáng/tối, giảm chuyển động, Enter mở/chọn trang, Escape đóng, trả focus.
 - Kéo bằng chuột từ (537,508) đến (300,300): vị trí mới (268,268), lưu localStorage; menu vẫn đóng. Nhấn tiếp mở menu, dùng Enter chọn Đơn hàng thành công.
 - Máy chủ dữ liệu local không kết nối; không kiểm tra ghi đơn thật hoặc số đơn từ máy chủ. Không tạo dữ liệu thử trên hệ thống bán hàng.
+
+## Sửa bố cục cung tròn
+
+Thuật toán chọn từng chỗ trống trước đây tạo các bán kính tùy ý, khiến menu phân tán dù không chồng hình chữ nhật kiểm thử. Thay bằng kiểm tra nguyên bộ cung có bước góc đều; ưu tiên nhãn cùng phía, dùng hai tầng đồng tâm nếu một tầng không vừa. Dành khoảng trống 8px giữa vùng bao gồm cả viền/huy hiệu. Trên màn hình quá thấp, tâm menu mở tạm dịch đến vị trí an toàn gần nhất; vị trí kéo đã lưu không thay đổi. Không ném lỗi render nếu màn hình co rất nhỏ.
 
 ## Các tương tác để chọn biểu cảm sau
 

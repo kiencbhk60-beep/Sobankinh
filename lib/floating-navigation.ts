@@ -45,53 +45,94 @@ export function avoidActions(point: Point, view: Viewport, actions: Rect[]): Poi
   return candidates[0] || safe;
 }
 
-/** Prefer the original quarter-circle. Near an edge or the centre, use a wider/two-ring fan. */
-export function menuLayout(anchor: Point, view: Viewport, count = 5): MenuPlacement[] {
+/** Fit complete, evenly spaced arcs rather than unrelated free slots. */
+function fitMenuLayout(anchor: Point, view: Viewport, count = 5): MenuPlacement[] | null {
   const origin = {x: anchor.x + MASCOT_SIZE / 2, y: anchor.y + MASCOT_SIZE / 2};
-  const avatar: Rect = {left: anchor.x, top: anchor.y, right: anchor.x + MASCOT_SIZE, bottom: anchor.y + MASCOT_SIZE};
+  const avatar: Rect = {left: anchor.x - 5, top: anchor.y - 5, right: anchor.x + MASCOT_SIZE + 5, bottom: anchor.y + MASCOT_SIZE + 5};
   const inside = (r: Rect) => r.left >= margin && r.right <= view.width - margin && r.top >= margin && r.bottom <= view.height - margin;
-  const place = (x: number, y: number, above = false): MenuPlacement | null => {
-    const circle = {left: x - 24, top: y - 24, right: x + 24, bottom: y + 24};
-    const labelLeft = clamp(x - 44, margin, view.width - margin - 88);
-    const labelTop = y + (above ? -58 : 30);
+  const place = (radius: number, angle: number, caption: number): MenuPlacement | null => {
+    const x = origin.x + Math.cos(angle) * radius, y = origin.y + Math.sin(angle) * radius;
+    // Reserve space for the selected ring, focus outline and notification badge.
+    const circle = {left: x - 30, top: y - 30, right: x + 32, bottom: y + 30};
+    const labelLeft = clamp(x + (caption === 2 ? 40 : caption === 3 ? -128 : -44), margin, view.width - margin - 88);
+    const labelTop = y + (caption === 0 ? 38 : caption === 1 ? -66 : -14);
     const label = {left: labelLeft, top: labelTop, right: labelLeft + 88, bottom: labelTop + 28};
-    if (![circle, label].every(r => inside(r) && !overlaps(r, avatar, 6))) return null;
+    if (![circle, label].every(r => inside(r) && !overlaps(r, avatar, 8)) || overlaps(circle, label, 8)) return null;
     return {x: x - origin.x, y: y - origin.y, labelX: labelLeft - x, labelY: labelTop - y, boxes: [circle, label]};
   };
-  const compatible = (a: MenuPlacement, b: MenuPlacement) => !a.boxes.some(r => b.boxes.some(s => overlaps(r, s)));
-  const direction = origin.x > view.width / 2 ? (origin.y > view.height / 2 ? -135 : 135) : (origin.y > view.height / 2 ? -45 : 45);
-  const canonical = Array.from({length: count}, (_, index) => {
-    const angle = (direction - 45 + index * 90 / Math.max(1, count - 1)) * Math.PI / 180;
-    return place(origin.x + Math.cos(angle) * 222, origin.y + Math.sin(angle) * 222);
-  });
-  if (canonical.every((p): p is MenuPlacement => !!p) && canonical.every((p, i) => canonical.slice(i + 1).every(q => compatible(p, q)))) return canonical;
+  const compatible = (a: MenuPlacement, b: MenuPlacement) => !a.boxes.some(r => b.boxes.some(s => overlaps(r, s, 8)));
+  const direction = Math.round(Math.atan2(view.height / 2 - origin.y, view.width / 2 - origin.x) / (Math.PI / 16)) * Math.PI / 16;
+  const turns = [0, ...Array.from({length: 16}, (_, i) => [i + 1, -i - 1]).flat()];
+  const fit = (radii: number[], angles: number[], captionMode?: number): MenuPlacement[] | null => {
+    // Reject the complete arc before exploring caption placements.
+    for (let i = 0; i < count; i++) {
+      const x = origin.x + Math.cos(angles[i]) * radii[i], y = origin.y + Math.sin(angles[i]) * radii[i];
+      const circle = {left:x-30,top:y-30,right:x+32,bottom:y+30};
+      if (!inside(circle) || overlaps(circle, avatar, 8)) return null;
+    }
+    const choices = radii.map((radius,index) => (captionMode === undefined ? [0,1,2,3] : [captionMode])
+      .map(caption => place(radius, angles[index], caption)).filter((p): p is MenuPlacement => !!p));
+    if (choices.some(options => !options.length)) return null;
+    const chosen: MenuPlacement[] = [];
+    const visit = (index: number): boolean => {
+      if (index === count) return true;
+      for (const p of choices[index]) {
+        if (chosen.every(q => compatible(p, q))) {
+          chosen.push(p);
+          if (visit(index + 1)) return true;
+          chosen.pop();
+        }
+      }
+      return false;
+    };
+    return visit(0) ? chosen : null;
+  };
+  let mixedSingle: MenuPlacement[] | null = null;
+  single: for (const captionMode of [0, 1, undefined]) {
+  for (const span of [90, 112.5, 135, 157.5, 180, 225, 270, 288]) {
+    for (const radius of [192, 208, 224, 240, 256, 272, 288, 176, 160, 144, 128, 112]) {
+      for (const turn of turns) {
+        const centre = direction + turn * Math.PI / 16;
+        const angles = Array.from({length: count}, (_, i) => centre + (i / Math.max(1, count - 1) - .5) * span * Math.PI / 180);
+        const result = fit(Array(count).fill(radius), angles, captionMode);
+        if (result) {
+          if (captionMode !== undefined) return result;
+          mixedSingle = result; break single;
+        }
+      }
+    }
+  }
+  }
+  // Two concentric arcs with constant radii and regular angular steps.
+  for (const captionMode of [0, 1, undefined]) {
+  if (captionMode === undefined && mixedSingle) return mixedSingle;
+  for (const outer of [216, 232, 248, 200, 184, 168, 152]) for (const inner of [104, 120, 132, 136]) {
+    if (outer - inner < 80) continue;
+    for (const span of [60, 75, 90, 105, 120, 150, 180, 240]) for (const aligned of [true, false]) for (const innerSpread of [1, 1.5, 2]) for (const turn of turns) {
+      const centre = direction + turn * Math.PI / 16;
+      const radii = Array.from({length: count}, (_, i) => i % 2 ? inner : outer);
+      const angles = Array.from({length: count}, (_, i) => {
+        const fraction = aligned && i % 2 ? (i - 1) / Math.max(1, count - 3) : i / Math.max(1, count - 1);
+        return centre + (fraction - .5) * span * (i % 2 ? innerSpread : 1) * Math.PI / 180;
+      });
+      const result = fit(radii, angles, captionMode);
+      if (result) return result;
+    }
+  }
+  }
+  return null;
+}
 
-  const candidates: (MenuPlacement & {score: number; angle: number})[] = [];
-  const centre = direction * Math.PI / 180;
-  for (const radius of [222, 180, 140, 104, 260]) for (let step = 0; step < 32; step++) {
-    const angle = step * Math.PI / 16;
-    const difference = Math.abs(Math.atan2(Math.sin(angle - centre), Math.cos(angle - centre)));
-    for (const above of [false, true]) {
-      const p = place(origin.x + Math.cos(angle) * radius, origin.y + Math.sin(angle) * radius, above);
-      if (p) candidates.push({...p, score: Math.abs(radius - 222) / 30 + difference + (above ? .4 : 0), angle});
-    }
+/** On a very short viewport, temporarily move the open menu to the nearest safe origin. */
+export function navigationLayout(anchor: Point, view: Viewport) {
+  const direct = fitMenuLayout(anchor, view);
+  if (direct) return {anchor, items: direct};
+  const candidates = [0, .5, 1].flatMap(x => [0, .5, 1].map(y => clampAnchor({
+    x: 12 + (view.width - 88) * x, y: 12 + (view.height - 88) * y,
+  }, view))).sort((a,b) => Math.hypot(a.x-anchor.x,a.y-anchor.y)-Math.hypot(b.x-anchor.x,b.y-anchor.y));
+  for (const point of candidates) {
+    const items = fitMenuLayout(point, view);
+    if (items) return {anchor: point, items};
   }
-  // Additional safe slots for very short landscape viewports.
-  for (let y = 40; y <= view.height - 68; y += 88) for (const x of [56, view.width / 2, view.width - 56]) {
-    const p = place(x, y);
-    if (p) candidates.push({...p, score: 100, angle: Math.atan2(y - origin.y, x - origin.x)});
-  }
-  candidates.sort((a, b) => a.score - b.score);
-  const order = (items: MenuPlacement[]) => items.sort((a, b) => {
-    const angle = (p: MenuPlacement) => (Math.atan2(p.y, p.x) - centre + Math.PI * 3) % (Math.PI * 2);
-    return angle(a) - angle(b);
-  });
-  for (let seed = -1; seed < Math.min(40, candidates.length); seed++) {
-    const chosen: MenuPlacement[] = seed < 0 ? [] : [candidates[seed]];
-    for (const candidate of candidates) {
-      if (chosen.every(p => compatible(p, candidate))) chosen.push(candidate);
-      if (chosen.length === count) return order(chosen);
-    }
-  }
-  throw Error('The viewport is too small to display the navigation safely.');
+  return {anchor, items: []};
 }

@@ -3,7 +3,7 @@
 import {useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent} from 'react';
 import {LayoutDashboard, ShoppingBag, Coins, ClipboardList, Package, X} from 'lucide-react';
 import MascotAvatar from './mascot-avatar';
-import {POSITION_KEY, defaultAnchor, clampAnchor, loadAnchor, saveAnchor, avoidActions, menuLayout, type Point, type Viewport} from '../lib/floating-navigation';
+import {POSITION_KEY, defaultAnchor, clampAnchor, loadAnchor, saveAnchor, avoidActions, navigationLayout, type Point, type Viewport} from '../lib/floating-navigation';
 import './floating-navigation.css';
 
 type Props = {tab: string; onNavigate: (tab: string) => void; openOrderCount: number; modalOpen: boolean};
@@ -24,7 +24,8 @@ export default function FloatingNavigation({tab, onNavigate, openOrderCount, mod
     {label: 'Kho hàng', Icon: Package},
   ];
   const point = anchor || defaultAnchor(view);
-  const placements = useMemo(() => present ? menuLayout(point, view) : [], [present, anchor, view]);
+  const layout = useMemo(() => present ? navigationLayout(point, view) : {anchor: point, items: []}, [present, anchor, view]);
+  const placements = layout.items;
 
   function move(next: Point, avoid = false) {
     const v = viewport.current;
@@ -124,7 +125,7 @@ export default function FloatingNavigation({tab, onNavigate, openOrderCount, mod
       <MascotAvatar active={!present}/>
       {openOrderCount > 0 && <span className="radial-count"><span className="radial-sr-only">Thông báo: </span>{openOrderCount}</span>}
     </button>
-    <dialog ref={dialog} id="ledger-radial-dialog" className={`radial-dialog${expanded ? ' is-expanded' : ''}`} aria-label="Điều hướng Sổ bán kính" onCancel={event => {event.preventDefault();close();}} onClick={event=>{if(event.target===event.currentTarget)close();}} onClose={()=>{setExpanded(false);setPresent(false);reposition.current();trigger.current?.focus({preventScroll:true});}}>
+    <dialog ref={dialog} id="ledger-radial-dialog" style={{'--radial-left': `${layout.anchor.x}px`, '--radial-top': `${layout.anchor.y}px`} as CSSProperties} className={`radial-dialog${expanded ? ' is-expanded' : ''}`} aria-label="Điều hướng Sổ bán kính" onCancel={event => {event.preventDefault();close();}} onClick={event=>{if(event.target===event.currentTarget)close();}} onClose={()=>{setExpanded(false);setPresent(false);reposition.current();trigger.current?.focus({preventScroll:true});}}>
       <nav className="radial-items" aria-label="Chức năng Sổ bán kính" inert={!expanded}>
         {items.map(({label,Icon,count},index)=>{
           const p=placements[index];
