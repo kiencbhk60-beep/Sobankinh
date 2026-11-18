@@ -2,6 +2,12 @@ import type {StateId} from './bloub/states';
 import type {ExpressionId} from './bloub/expressions';
 
 export type Reaction = {state: StateId; expression: ExpressionId; duration: number; priority: number};
+export const IDLE_DELAY = 8000;
+export const IDLE_SEQUENCE: Reaction[] = [
+  {state:'wink',expression:'neutre',duration:1600,priority:0},
+  {state:'thinking',expression:'neutre',duration:2600,priority:0},
+  {state:'wide',expression:'neutre',duration:1800,priority:0},
+];
 const pose = (state: StateId, expression: ExpressionId = 'neutre', duration = 2600, priority = 40): Reaction => ({state, expression, duration, priority});
 export const REACTIONS = {
   neutral: pose('idle', 'neutre', 1600),

@@ -73,8 +73,8 @@ Thuật toán chọn từng chỗ trống trước đây tạo các bán kính t
 | 21 | Wink khi chuyển sáng/tối |
 | 22 | Proud khi xuất/sao lưu tệp |
 | 23 | Comet khi mở shop |
-| 24 | Sleep sau 60 giây không thao tác, Notification khi thao tác lại hoặc quay lại tab |
+| 24 | Sau 8 giây không thao tác: lặp Wink (1,6s) → Thinking (2,6s) → Wide eyes (1,8s). Thao tác lại dừng ngay chuỗi; quay lại tab vẫn có Notification |
 
 Orbit trong menu được ưu tiên hơn mọi phản ứng nghiệp vụ. Sự kiện kết nối thụ động không che mất thông báo lỗi/thành công. Trong biểu mẫu, mascot nhỏ nằm ở tiêu đề, không cản nút lưu hoặc nhập liệu. Giảm chuyển động: vẽ khung tĩnh của hiệu ứng được chọn; không chạy requestAnimationFrame. Khi ẩn tab thì tạm dừng animation. Dọn timer và listener khi unmount.
 
-Các trạng thái thành công chỉ được kích hoạt sau phản hồi thật của hệ thống. Không thêm polling, dữ liệu mẫu mới hoặc thay đổi API/quy tắc nghiệp vụ. tests/mascot-reactions.mjs kiểm tra các lựa chọn, vòng Orbit/hạt Notification/Thinking, phân loại kết quả lưu, ưu tiên, thử lại sau lỗi, timeout về trung tính, ngủ/thức và dọn tài nguyên.
+Các trạng thái thành công chỉ được kích hoạt sau phản hồi thật của hệ thống. Không thêm polling, dữ liệu mẫu mới hoặc thay đổi API/quy tắc nghiệp vụ. tests/mascot-reactions.mjs kiểm tra các lựa chọn, vòng Orbit/hạt Notification/Thinking, phân loại kết quả lưu, ưu tiên, thử lại sau lỗi, timeout về trung tính, thứ tự chuỗi đứng yên, ngắt khi thao tác/ẩn tab và dọn tài nguyên. Chuỗi không đè trạng thái đang lưu/kết nối, không thay Orbit của menu.
